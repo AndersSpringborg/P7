@@ -6,7 +6,7 @@ from wine import Wine, ExtractedWine
 import sys
 import db
 
-#need more filtering on what good wine data is
+#retrieves relevant wine data from RareWines server
 def get_wines_from_rare_wine():
     list_of_wine = []
     data_df = pd.read_json("https://rarewinestorage.blob.core.windows.net/rare-wine-public/wine_data.json", encoding='utf-8')
@@ -18,17 +18,20 @@ def get_wines_from_rare_wine():
     return list_of_wine
 
 
-
+#General webscaper class which specifies methods applicable for a generic page
 class Webscaper:
     def __init__(self, wines):
         self.wines = wines
     
+    #checks whether it is polite to crawl the a given url string.
     def crawl_enabled(url):
         rp=RobotFileParser()
         rp.set_url(url)
         rp.read()
         return rp.can_fetch("*",url)
 
+#Scraper for Zachy webshop
+###NOTE: has not been completed as it is no longer relevant ###
 class ZachyScaper(Webscaper):
 
     def __init__(self):
@@ -40,10 +43,12 @@ class ZachyScaper(Webscaper):
             link_to_crawl = 'https://www.zachys.com/instantsearchplus/result/?q='+query
             r = requests.get(link_to_crawl)
 
+#Scraper for the Wine Owners trading platform
 class WineOwnerScraper(Webscaper):
     def __init__(self):
         super.__init__()
 
+    #retrieves the relevant wine price information from the Wine Owners.
     def crawl(self):
         for wine in self.wines:
             wine_name = wine.name
@@ -61,5 +66,3 @@ class WineOwnerScraper(Webscaper):
                 db.add_wine(extracted_wine)
             sleep(2)
         db.save()
-
-#get_wines_from_rare_wine()

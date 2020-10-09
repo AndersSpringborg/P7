@@ -1,3 +1,4 @@
+#Wine class for necessary data from Rarewine dataset
 class Wine:
     def __init__(self, name, price,year, lwin):
         self.name = name
@@ -5,6 +6,7 @@ class Wine:
         self.year = year
         self.lwin = lwin
 
+#Wine class containing the necessary infomation for the dataset consisting of extracted data from the web
 class ExtractedWine:
     def __init__(self, name, original_name, lwin, original_year, year, wine_offer_price,price):
         self.name = name
