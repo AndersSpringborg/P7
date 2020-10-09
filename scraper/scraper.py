@@ -2,8 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.robotparser import RobotFileParser
 import pandas as pd
-from wine import Wine
+from wine import Wine, ExtractedWine
 import sys
+import db
 
 #need more filtering on what good wine data is
 def get_wines_from_rare_wine():
@@ -13,20 +14,7 @@ def get_wines_from_rare_wine():
     data_df = data_df.dropna(axis=0, subset=['linkedWineLwin'])
     count = 0
     for index, row in data_df.iterrows():
-        #name, region, year, producer, type
-        print('wineName ' +str(row['wineName']))
-        print('linkedWineLwin ' +str(row['linkedWineLwin']))
-        print('producer ' +str(row['producer']))
-        print('year ' +str(row['year']))
-        print('region ' +str(row['region']))
-        print('subRegion ' +str(row['subRegion']))
-        print('colour ' +str(row['colour']))
-        print(' ')
-        print(' ')
-        if count > 2:
-            sys.exit(-1)
-        count = count +1
-        list_of_wine.append(Wine(row['wineName'], row['region'], row['year'], row['producer'], row['type']))
+        list_of_wine.append(Wine(row['wineName'], row['price'], row['year'], str(row['linkedWineLwin'])))
     return list_of_wine
 
 
@@ -63,7 +51,15 @@ class WineOwnerScraper(Webscaper):
             link_to_crawl = 'https://www.wineowners.com/wine-list-search.aspx?st=AW&reset=Y&name='+wine_name+'&vintage=' + str(vintage)
             r = requests.get(link_to_crawl)
             r_parse = BeatifulSoup(r.text,'html.parser')
-            for a in r_parse.find_all('tbody'):
-                pass
-                #a is the only table in the list travers this to get data and link for further information.
 
+            rows = r_parse.find_all('tbody')[0].find_all('tr')
+            for row in rows:
+                name_of_wine = row.find_all('a')[1].text
+                wine_year = row.find_all('td', {"class": "hidden-xs"})[0].text
+                price = row.find_all('td')[3].text
+                extracted_wine = ExtractedWine(name_of_wine, wine.name, wine.lwin, wine.year,wine_year, wine.price, price)
+                db.add_wine(extracted_wine)
+            sleep(2)
+        db.save()
+
+#get_wines_from_rare_wine()

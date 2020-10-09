@@ -1,11 +1,17 @@
 class Wine:
-    def __init__(self, name, region, year, producer, type, critics_score="default", volume="default",  price="default", lwin=0):
+    def __init__(self, name, price,year, lwin):
         self.name = name
         self.price = price
-        self.region = region
         self.year = year
-        self.critics_score = critics_score
-        self.producer = producer
-        self.type = type
-        self.volume = volume
-        self.linkedWineLwin = lwin
+        self.lwin = lwin
+
+class ExtractedWine:
+    def __init__(self, name, original_name, lwin, original_year, year, wine_offer_price,price):
+        self.name = name
+        self.original_name = original_name
+        self.lwin = lwin
+        self.original_year = original_year
+        self.year = year
+        self.wine_offer_price
+        self.price = price
+ 

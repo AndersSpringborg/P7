@@ -5,28 +5,25 @@ import pandas as pd
 import pathlib
 
 wines = {
-        "Name": [],
-        "Price": [],
-        "Region": [],
-        "Year": [],
-        "CriticsScore": [],
-        "Producer": [],
-        "Type": [],
-        "Volume": [],
-        "Lwin": []
+        "name": [],
+        "original_name": [],
+        "lwin":[],
+        "original_year" : [],
+        "year": [],
+        "wine_offer_price":[],
+        "price": []
         }
 
+
 # Adds wine to record.
-def add_wine(wine_obj):
-    wines["Name"].append(wine_obj.name)
-    wines["Price"].append(wine_obj.price)
-    wines["Region"].append(wine_obj.region)
-    wines["Year"].append(wine_obj.year)
-    wines["CriticsScore"].append(wine_obj.critics_score)
-    wines["Producer"].append(wine_obj.producer)
-    wines["Type"].append(wine_obj.type)
-    wines["Volume"].append(wine_obj.volume)
-    wines["Lwin"].append(wine_obj.linkedWineLwin)
+def add_wine(extracted_wine_obj):
+    wines["name"].append(extracted_wine_obj.name)
+    wines["original_name"].append(extracted_wine_obj.original_name)
+    wines["lwin"].append(extracted_wine_obj.lwin)
+    wines["original_year"].append(extracted_wine_obj.original_year)
+    wines["year"].append(extracted_wine_obj.year)
+    wines["wine_offer_price"].append(extracted_wine_obj.wine_offer_price)
+    wines["price"].append(extracted_wine_obj.price)
 
 # Stores record in .cvs file and clears wine record.
 def save():
