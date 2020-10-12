@@ -3,15 +3,13 @@ import sqlite3
 # Wine database class.
 class wine_db:
     def __init__(self, filename = "wine.db"):
-        self.connection = sqlite3.connect(filename)
-        c = self.connection.cursor()
-
-        c.execute('''CREATE TABLE IF NOT EXISTS wines
-                    (name VARCHAR(100) NOT NULL,
-                     lwin INT NOT NULL,
-                     rank INT UNIQUE),
-                     PRIMARY KEY (lwin)''')
+        self.reopen()
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS wines 
+                            (name VARCHAR(100) NOT NULL, 
+                            lwin INT NOT NULL PRIMARY KEY, 
+                            rank INT UNIQUE)''')
         self.connection.commit()
+        self.close()
     
     def __del__(self):
         if (self.connection != None):
@@ -31,25 +29,30 @@ class wine_db:
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
-        c = self.connection.cursor()
-        c.execute("INSERT INTO wines VALUES ({name},{lwin}, {rank})")
-        self.connection.commit() 
+        self.reopen()
+        self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES ('" + name + "', " + str(lwin) + ", " + str(rank) + ")")
+        self.connection.commit()
+        self.close()
 
     # Returns sorted list of ranked wines.
     def get_ranked_wines(self):
-        c = self.connection.cursor()
-        c.execute("SELECT * FROM wines ORDER BY rank ASC")
-        c.fetchall()
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.reopen()
+        result = self.connection.execute("SELECT * FROM wines ORDER BY rank ASC")
 
         result_list = []
-        
-        for row in c:
+
+        for row in result:
             result_list.append(tuple(row))
 
+        self.close()
         return result_list
 
     # Clears table of content.
     def clear_wines(self):
-        c = self.connection.cursor()
-        c.execute("DELETE FROM wines")
+        self.reopen()
+        self.connection.execute("DELETE FROM wines")
         self.connection.commit()
+        self.close()
