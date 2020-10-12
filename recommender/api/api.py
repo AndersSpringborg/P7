@@ -10,7 +10,7 @@ def read_recommendation():
 
 @app.route('/data', methods = ['POST'])
 def write_data():
-    return "Post request"
+    return "POST request"
 
 if (__name__ == "__main__"):
     app.run()
