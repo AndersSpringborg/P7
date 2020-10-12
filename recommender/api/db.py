@@ -6,7 +6,7 @@ class wine_db:
         self.connection = sqlite3.connect(filename)
         c = self.connection.cursor()
 
-        c.execute('''CREATE TABLE wines
+        c.execute('''CREATE TABLE IF NOT EXISTS wines
                     (name VARCHAR(100) NOT NULL,
                      lwin INT NOT NULL,
                      rank INT UNIQUE),
@@ -47,7 +47,6 @@ class wine_db:
             result_list.append(tuple(row))
 
         return result_list
-            
 
     # Clears table of content.
     def clear_wines(self):
