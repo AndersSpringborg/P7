@@ -27,6 +27,14 @@ class wine_db:
         if (self.connection != None):
             self.connection.close()
 
+    # Checks whether database is empty.
+    def empty(self):
+        self.reopen()
+        result = self.connection.execute("SELECT * FROM wines")
+        self.close()
+
+        return result.arraysize == 0
+
     # Adds wine.
     def add_wine(self, name, lwin, rank):
         if (self.connection == None):
