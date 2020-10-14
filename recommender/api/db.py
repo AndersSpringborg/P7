@@ -1,8 +1,11 @@
 import sqlite3
+import pandas as pd
 
 # Wine database class.
 class wine_db:
     def __init__(self, filename = "wine.db"):
+        self.columns = ['name', 'lwin', 'rank']
+
         self.reopen()
         self.connection.execute('''CREATE TABLE IF NOT EXISTS wines 
                             (name VARCHAR(100) NOT NULL, 
@@ -29,13 +32,15 @@ class wine_db:
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
+        t = tuple(name, lwin, rank)
+
         self.reopen()
-        self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES ('" + name + "', " + str(lwin) + ", " + str(rank) + ")")
+        self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES (" + self.__sql_str_insert(t) + ")")
         self.connection.commit()
         self.close()
 
     # Adds several wines.
-    # wines is a list of maps with entries for each wine field.
+    # wines is a pandas dataframe.
     def add_wines(self, wines):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -43,26 +48,39 @@ class wine_db:
         self.reopen()
 
         for wine in wines:
-            self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES ('" + wine['name'] + "', " + str(wine['lwin']) + ", " + str(wine['rank']) + ")")
+            self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES (" + self.__sql_str_insert(wine) + ")")
         
         self.connection.commit()
         self.close()
 
-    # Returns sorted list of ranked wines.
+    # Returns full string of SQL insertion values.
+    def __sql_str_insert(wine):
+        res = ""
+
+        for attribute in wine:
+            if type(attribute) is str:
+                res = res + "'" + attribute + "'"
+
+            else:
+                res = res + attribute
+
+    # Returns sorted pandas dataframe.
     def get_ranked_wines(self):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
         self.reopen()
         result = self.connection.execute("SELECT * FROM wines ORDER BY rank ASC")
-
-        result_list = []
+        df = pd.DataFrame(columns = self.columns)
+        i = 0
 
         for row in result:
-            result_list.append(tuple(row))
+            for attribute in tuple(row):
+                df.loc[i] = df.loc[i] + attribute
+            i = i + 1
 
         self.close()
-        return result_list
+        return df
 
     # Clears table of content.
     def clear_wines(self):
