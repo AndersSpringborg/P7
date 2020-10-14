@@ -34,6 +34,20 @@ class wine_db:
         self.connection.commit()
         self.close()
 
+    # Adds several wines.
+    # wines is a list of maps with entries for each wine field.
+    def add_wines(self, wines):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.reopen()
+
+        for wine in wines:
+            self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES ('" + wine['name'] + "', " + str(wine['lwin']) + ", " + str(wine['rank']) + ")")
+        
+        self.connection.commit()
+        self.close()
+
     # Returns sorted list of ranked wines.
     def get_ranked_wines(self):
         if (self.connection == None):
