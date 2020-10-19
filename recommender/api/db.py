@@ -30,10 +30,12 @@ class wine_db:
     # Checks whether database is empty.
     def empty(self):
         self.reopen()
-        result = self.connection.execute("SELECT * FROM wines")
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM wines")
+        row = cursor.fetchone()
         self.close()
 
-        return result.arraysize == 0
+        return row == None
 
     # Adds wine.
     def add_wine(self, name, lwin, rank):
