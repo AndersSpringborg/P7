@@ -1,5 +1,5 @@
 import sqlite3
-import pandas as pd
+from pandas import DataFrame
 
 # Wine database class.
 class wine_db:
@@ -40,7 +40,8 @@ class wine_db:
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
-        t = tuple(name, lwin, rank)
+        t = (name, lwin, rank)
+        print(self.__sql_str_insert(t))
 
         self.reopen()
         self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES (" + self.__sql_str_insert(t) + ")")
@@ -62,15 +63,17 @@ class wine_db:
         self.close()
 
     # Returns full string of SQL insertion values.
-    def __sql_str_insert(wine):
+    def __sql_str_insert(wine_field_tuple):
         res = ""
 
-        for attribute in wine:
+        for attribute in wine_field_tuple:
             if type(attribute) is str:
-                res = res + "'" + attribute + "'"
+                res = res + "'" + attribute + "',"
 
             else:
-                res = res + attribute
+                res = res + attribute + ","
+
+        return res[:len(res) - 1]
 
     # Returns sorted pandas dataframe.
     def get_ranked_wines(self):
@@ -96,3 +99,11 @@ class wine_db:
         self.connection.execute("DELETE FROM wines")
         self.connection.commit()
         self.close()
+
+database = wine_db()
+database.add_wine("Wine 1", 123, 2)
+database.add_wine("Wine 2", 7654, 1)
+database.add_wine("Wine 3", 273, 3)
+
+df = database.get_ranked_wines()
+print(df)
