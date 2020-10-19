@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 import json
 import pandas as pd
-import db
+import db as data
 import recommend as rec
 
 app = Flask(__name__)
+database = data.wine_db()
 
 @app.route('/')
 def main_page():
@@ -13,11 +14,11 @@ def main_page():
 # TODO: First check if database is not empty.
 @app.route('/data', methods = ['GET'])
 def read_recommendation():
-    if db.empty():
-        return "No recommendations to make."
+    if database.empty():
+        return "null"
 
     data = {
-        "WineDeals": __wine_maps(db.get_ranked_wines())
+        "WineDeals": __wine_maps(database.get_ranked_wines())
     }
 
     return data
@@ -42,7 +43,6 @@ def write_data():
     # TODO: Create a pandas dataframe of parsed JSON wines and it into recommend.py.
     # TODO: Insert output into db.py.
 
-    database = db.wine_db()
     database.add_wines(rec.recommend(None))
 
 if (__name__ == "__main__"):
