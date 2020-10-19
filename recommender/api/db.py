@@ -90,11 +90,3 @@ class wine_db:
         self.connection.execute("DELETE FROM wines")
         self.connection.commit()
         self.close()
-
-database = wine_db()
-database.add_wine("Wine 1", 123, 2)
-database.add_wine("Wine 2", 7654, 1)
-database.add_wine("Wine 3", 273, 3)
-
-df = database.get_ranked_wines()
-print(df)
