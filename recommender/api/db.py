@@ -4,13 +4,14 @@ import pandas as pd
 # Wine database class.
 class wine_db:
     def __init__(self, filename = "wine.db"):
-        self.columns = ['name', 'lwin', 'rank']
+        self.columns = ['name', 'lwin', 'rank', 'bought']
 
         self.reopen()
         self.connection.execute('''CREATE TABLE IF NOT EXISTS wines 
                             (name VARCHAR(100) NOT NULL, 
                             lwin INT NOT NULL PRIMARY KEY, 
-                            rank INT UNIQUE)''')
+                            rank INT UNIQUE,
+                            bought INT)''')
         self.connection.commit()
         self.close()
     
@@ -38,11 +39,11 @@ class wine_db:
         return row == None
 
     # Adds wine.
-    def add_wine(self, name, lwin, rank):
+    def add_wine(self, name, lwin, rank, bought):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
-        t = (name, lwin, rank)
+        t = (name, lwin, rank, bought)
         self.reopen()
         self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES (" + self.__sql_str_insert(t) + ")")
         self.connection.commit()
