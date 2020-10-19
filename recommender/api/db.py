@@ -1,5 +1,5 @@
 import sqlite3
-from pandas import DataFrame
+import pandas as pd
 
 # Wine database class.
 class wine_db:
@@ -41,8 +41,6 @@ class wine_db:
             raise Exception("Wine database is closed.")
 
         t = (name, lwin, rank)
-        print(self.__sql_str_insert(t))
-
         self.reopen()
         self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES (" + self.__sql_str_insert(t) + ")")
         self.connection.commit()
@@ -63,7 +61,7 @@ class wine_db:
         self.close()
 
     # Returns full string of SQL insertion values.
-    def __sql_str_insert(wine_field_tuple):
+    def __sql_str_insert(self, wine_field_tuple):
         res = ""
 
         for attribute in wine_field_tuple:
@@ -71,7 +69,7 @@ class wine_db:
                 res = res + "'" + attribute + "',"
 
             else:
-                res = res + attribute + ","
+                res = res + str(attribute) + ","
 
         return res[:len(res) - 1]
 
@@ -81,17 +79,10 @@ class wine_db:
             raise Exception("Wine database is closed.")
 
         self.reopen()
-        result = self.connection.execute("SELECT * FROM wines ORDER BY rank ASC")
-        df = pd.DataFrame(columns = self.columns)
-        i = 0
-
-        for row in result:
-            for attribute in tuple(row):
-                df.loc[i] = df.loc[i] + attribute
-            i = i + 1
-
+        result = pd.read_sql_query("SELECT * FROM wines ORDER BY rank ASC", self.connection)
         self.close()
-        return df
+
+        return pd.DataFrame(result, columns = self.columns)
 
     # Clears table of content.
     def clear_wines(self):
