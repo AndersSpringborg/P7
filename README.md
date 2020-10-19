@@ -23,7 +23,7 @@ AAU 7th semester project.
 
 ## Installation
 
-First, you must [install npm here](https://www.npmjs.com/get-npm). Otherwise, you can [install yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable). Then, install React with the following commands:
+First, you must [install npm here](https://www.npmjs.com/get-npm). Otherwise, you can [install yarn](https://classic.yarnpkg.com/en/docs/install/#windows-stable). Now, install [dotnet](https://dotnet.microsoft.com/download). Then, install React with the following commands:
 
 ```
 npm install --save react

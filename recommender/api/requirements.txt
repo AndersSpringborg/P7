@@ -1,0 +1,6 @@
+pandas
+sqlite3
+flask
+request
+jsonify
+json
