@@ -1,23 +1,21 @@
 from flask import Flask, request, jsonify
 import json
 import pandas as pd
-import db as data
-import recommend as rec
 
 app = Flask(__name__)
-database = data.wine_db()
 
-@app.route('/')
+@app.route('/', methods = ['GET'])
 def main_page():
-    return "Send POST to '/data' to upload wine deals.\nSend GET to '/data' to read wine deals recommendation."
+    return '''POST: /data/transactions/ body: JSON transaction data. -> Upload transaction data to database.\r\n
+            POST: /data/wine_deals/ body: JSON wine deals data. -> Upload wine deals data to database.\r\n'
+            POST: /db_post/ body: Database content. -> Uploads raw content to insert into database.\r\n'
+            GET: /db_get/ -> Gets database content.'''
 
 @app.route('/data', methods = ['GET'])
 def read_recommendation():
-    if database.empty():
-        return "null"
-
+    # None is subbed with Pandas DataFrame.
     data = {
-        "WineDeals": __wine_maps(database.get_ranked_wines())
+        "WineDeals": __wine_maps(None)
     }
 
     return data
@@ -35,16 +33,5 @@ def __wine_maps(frame):
 
     return res
 
-# Appends received data to db.
-# Then, starts ranking the content of the DB and insert it into recommender db.
-@app.route('/data', methods = ['POST'])
-def write_data():
-    parsed = json.loads(request.data)
-    
-    # TODO: Create a pandas dataframe of parsed JSON wines and it into recommend.py.
-    # TODO: Insert output into db.py.
-
-    database.add_wines(rec.recommend(None))
-
-if (__name__ == "__main__"):
+if __name__ == "__main__":
     app.run()
