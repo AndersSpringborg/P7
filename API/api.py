@@ -22,9 +22,22 @@ def recommendation_get():
 def db_get():
     return "Contact db API to get recommendations."
 
-# Handles POST request from 3rd party to 
+# Handles POST request from 3rd party to add transaction data.
+@app.route('/data/transactions', methods = ['POST'])
+def transactions_post():
+    return "Post the data to db API."
 
-@app.route('/data', methods = ['GET'])
+# Handles POST request from 3rd party to add wine deals data.
+@app.route('/data/wine_deals', methods = ['POST'])
+def wine_deals_post():
+    return "Post the data to db API."
+
+# Handles POST request from recommender API to add content into db API.
+@app.route('/db_post', methods = ['POST'])
+def output_post():
+    return "Post the data to db API."
+
+"""@app.route('/data', methods = ['GET'])
 def read_recommendation():
     # None is subbed with Pandas DataFrame.
     data = {
@@ -44,7 +57,7 @@ def __wine_maps(frame):
             "rank": row['rank']
         })
 
-    return res
+    return res"""
 
 if __name__ == "__main__":
     app.run()
