@@ -11,7 +11,6 @@ database = data.wine_db()
 def main_page():
     return "Send POST to '/data' to upload wine deals.\nSend GET to '/data' to read wine deals recommendation."
 
-# TODO: First check if database is not empty.
 @app.route('/data', methods = ['GET'])
 def read_recommendation():
     if database.empty():
@@ -36,6 +35,8 @@ def __wine_maps(frame):
 
     return res
 
+# Appends received data to db.
+# Then, starts ranking the content of the DB and insert it into recommender db.
 @app.route('/data', methods = ['POST'])
 def write_data():
     parsed = json.loads(request.data)
