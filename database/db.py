@@ -1,18 +1,29 @@
 import sqlite3
 import pandas as pd
 
-
 # Wine database class.
 class wine_db:
     def __init__(self, filename = "wine.db"):
-        self.columns = ['name', 'lwin', 'rank', 'bought', 'pr', 'cbr']
+        self.columns_transactions = ['purchasorId', 'vendorId', 'type', 'wineName', 'volume', 'quantity', 'pricePrUnit', 'variantCode']
+        self.columns_offers = ['id', 'name', 'lwin', 'vendorId', 'pr', 'cbr']
 
         self.reopen()
-        self.connection.execute('''CREATE TABLE IF NOT EXISTS wines 
-                            (name VARCHAR(100) NOT NULL, 
-                            lwin INT NOT NULL PRIMARY KEY, 
-                            rank INT UNIQUE,
-                            bought INT,
+
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS transactions
+                            (purchasorId VARCHAR(5),
+                            vendorId INT NOT NULL,
+                            type VARCHAR(20) NOT NULL,
+                            wineName VARCHAR(100) NOT NULL,
+                            volume VARCHAR(10),
+                            quantity INT NOT NULL,
+                            pricePrUnit REAL NOT NULL,
+                            variantCode INT NOT NULL)''')
+        
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS offers 
+                            (id INT NOT NULL PRIMARY KEY,
+                            name VARCHAR(100) NOT NULL, 
+                            lwin INT NOT NULL,
+                            vendorId INT NOT NULL, 
                             pr INT,
                             cbr INT)''')
         self.connection.commit()
@@ -35,7 +46,7 @@ class wine_db:
     def empty(self):
         self.reopen()
         cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM wines")
+        cursor.execute("SELECT * FROM offers")
         row = cursor.fetchone()
         self.close()
 
@@ -48,7 +59,7 @@ class wine_db:
 
         t = (name, lwin, rank, bought, pr, cbr)
         self.reopen()
-        self.connection.execute("INSERT INTO wines (name, lwin, rank, bought, pr, cbr) VALUES (" + self.__sql_str_insert(t) + ")")
+        self.connection.execute("INSERT INTO offers (id, name, lwin, vendorId, pr, cbr) VALUES (" + self.__sql_str_insert(t) + ")")
         self.connection.commit()
         self.close()
 
@@ -61,7 +72,7 @@ class wine_db:
         self.reopen()
 
         for wine in wines:
-            self.connection.execute("INSERT INTO wines (name, lwin, rank) VALUES (" + self.__sql_str_insert(wine) + ")")
+            self.connection.execute("INSERT INTO offers (name, lwin) VALUES (" + self.__sql_str_insert(wine) + ")")
         
         self.connection.commit()
         self.close()
@@ -85,14 +96,14 @@ class wine_db:
             raise Exception("Wine database is closed.")
 
         self.reopen()
-        result = pd.read_sql_query("SELECT * FROM wines ORDER BY rank ASC", self.connection)
+        result = pd.read_sql_query("SELECT * FROM offers ORDER BY pr ASC", self.connection)
         self.close()
 
-        return pd.DataFrame(result, columns = self.columns)
+        return pd.DataFrame(result, columns = self.colums_offers)
 
     # Clears table of content.
     def clear_wines(self):
         self.reopen()
-        self.connection.execute("DELETE FROM wines")
+        self.connection.execute("DELETE FROM offers")
         self.connection.commit()
         self.close()
