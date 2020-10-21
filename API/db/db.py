@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 
+
 # Wine database class.
 class wine_db:
     def __init__(self, filename = "wine.db"):
