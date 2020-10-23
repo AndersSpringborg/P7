@@ -1,0 +1,52 @@
+# This workflows will upload a Python Package using Twine when a release is created.
+
+name: Contiuous integration
+
+on: [pull_request]
+
+jobs:
+  buildAndTest:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+          if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
+
+      #- name: Python tests
+      #  run: |
+      #    pytest
+
+      #- name: Tester
+      #  run: 
+  
+  # Setup docker.
+  #deploy:
+
+  #  runs-on: ubuntu-latest
+
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Set up Python
+  #    uses: actions/setup-python@v2
+  #    with:
+  #      python-version: '3.x'
+  #  - name: Build and publish
+  #    env:
+  #      TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+  #      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+  #    run: |
+  #      python setup.py sdist bdist_wheel
+  #      twine upload dist/*

@@ -1,6 +1,5 @@
 pandas
-sqlite3
+pysqlite3
 flask
-request
+requests
 jsonify
-json
