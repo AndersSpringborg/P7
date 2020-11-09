@@ -1,3 +1,5 @@
+Check JSON formats [here](https://docs.google.com/document/d/1PTmUCPtob0ky2TEE5n0RK8GKLujyaZvZeJfRc5OOF0A/edit).
+
 ## GET requets
 ### GET request to recommendations
 - Respond with exact copy of wine deals relation.
