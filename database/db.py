@@ -190,7 +190,7 @@ class wine_db:
         return returnOffer
 
     def clean_transactions_data(self, transactions):
-        return [i for i in transactions if i['Item description'] != "Certificate"]
+        return [i for i in transactions if i['LWIN No_'] != ""]
 
 
 def main():
@@ -216,7 +216,8 @@ def main():
         db.add_wineoffers(wines)
 
     transactions_data = load_transactions_data()
-    db.add_transactions_data(transactions_data)
+    db.add_transactions_data(
+        db.clean_transactions_data(transactions_data))
 
 
 if __name__ == '__main__':
