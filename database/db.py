@@ -51,7 +51,7 @@ class wine_db:
                                     directunitcost REAL,
                                     amount REAL,
                                     variantcode INT,
-                                    postingdate VARCHAR(20),
+                                    postingdate DATETIME,
                                     purchaseinitials VARCHAR(5))''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS offers
@@ -75,7 +75,7 @@ class wine_db:
                                     region VARCHAR(30),
                                     subRegion VARCHAR(30),
                                     colour VARCHAR(30),
-                                    createdAt VARCHAR(30),
+                                    createdAt DATETIME,
                                     vendorId VARCHAR(50))''')
         self.connection.commit()
         self.close()
@@ -103,6 +103,49 @@ class wine_db:
 
         return row == None
 
+    # Retrieves all entries from the offers table.
+    def get_all_offers(self):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute('select * from offers').fetchall()
+
+        self.connection.commit()
+        self.connection.close()
+
+        return json.dumps([dict(ix) for ix in rows])
+
+    # Retrieves all entries from the transactions table.
+    def get_all_transactions(self):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute('select * from transactions').fetchall()
+
+        return json.dumps([dict(ix) for ix in rows])
+
+    # Retrieves offers after a given timestamp.
+    def get_offers_from_timestamp(self, timestamp):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute(
+            "SELECT * FROM offers WHERE createdAt>=?;", [timestamp]).fetchall()
+
+        return json.dumps([dict(ix) for ix in rows])
+
     def clear_offers_table(self):
         self.open_connection()
         self.connection.execute("DELETE FROM * offers")
@@ -116,7 +159,8 @@ class wine_db:
         self.open_connection()
 
         for wine in sql_wineoffers:
-            print("Inserting wine: " + wine.wineName + " with ID: " + wine.id)
+            print("Inserting wine: " + wine.originalOfferText +
+                  " with ID: " + wine.id)
             cursor = self.connection.cursor()
             cursor.execute('''INSERT OR IGNORE INTO offers(
                                               id,
@@ -153,7 +197,8 @@ class wine_db:
         self.open_connection()
 
         for transaction in transactions:
-            print("Inserting item: " + transaction['Description'])
+            print("Inserting transaction with description: " +
+                  transaction['Description'])
             cursor = self.connection.cursor()
             cursor.execute('''INSERT OR IGNORE INTO transactions(
                                               vendorId,
@@ -195,11 +240,11 @@ class wine_db:
 
 def main():
     def load_offers_data():
-        with open('wine_data.json', encoding="utf-8") as offers_data:
+        with open('test_offers.json', encoding="utf-8") as offers_data:
             return json.load(offers_data, strict=False)
 
     def load_transactions_data():
-        csv_data_df = pd.read_csv('data_with_lwin.csv')
+        csv_data_df = pd.read_csv('test_trans.csv')
         return csv_data_df.to_dict(orient='record')
 
     def create_sqlwine(offer):
@@ -209,15 +254,30 @@ def main():
     wines = []
     offers_data = load_offers_data()
 
+    # Inserting offers
     for offer in offers_data:
         current_offer = db.clean_offers_data(offer)
         if current_offer is not None:
             wines.append(create_sqlwine(current_offer))
-        db.add_wineoffers(wines)
 
+    db.add_wineoffers(wines)
+
+    # Inserting transcations
     transactions_data = load_transactions_data()
     db.add_transactions_data(
         db.clean_transactions_data(transactions_data))
+
+    # Pretty print get all offers
+    json_object = json.loads(db.get_all_offers())
+    offers_formated_json = json.dumps(json_object, indent=2)
+    print(offers_formated_json)
+
+    # Pretty print get all offers from timestamp
+    json_object = json.loads(
+        db.get_offers_from_timestamp('2020-02-01'))
+
+    offers_from_timestamp_formated_json = json.dumps(json_object, indent=2)
+    print(offers_from_timestamp_formated_json)
 
 
 if __name__ == '__main__':
