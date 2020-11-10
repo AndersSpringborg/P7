@@ -1,8 +1,8 @@
 import db
-from flask import Flask, request
+import flask as flask
 
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 testdb = db.wine_db()
 # This defines a simple get request from root.
 
