@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
 import json
+import flask as flask
 
 
 class SQL_Wineoffer:
@@ -144,7 +145,7 @@ class wine_db:
         rows = c.execute(
             "SELECT * FROM offers WHERE createdAt>=?;", [timestamp]).fetchall()
 
-        return json.dumps([dict(ix) for ix in rows])
+        return flask.jsonify([dict(ix) for ix in rows])
 
     def clear_offers_table(self):
         self.open_connection()
