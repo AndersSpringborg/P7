@@ -1,40 +1,91 @@
 import sqlite3
 import pandas as pd
+import json
 
-# Wine database class.
+
+class SQL_Wineoffer:
+    def __init__(self, wine_id, supplierName, supplierEmail, linkedWineLwin, originalOfferText, producer, wineName, quantity, year, price, currency, isOWC, isOC, isIB, bottlesPerCase, bottleSize, bottleSizeNumerical, region, subRegion, colour, createdAt, vendorId):
+        self.id = wine_id
+        self.supplierName = supplierName
+        self.supplierEmail = supplierEmail
+        self.linkedWineLwin = linkedWineLwin
+        self.originalOfferText = originalOfferText
+        self.producer = producer
+        self.wineName = wineName
+        self.quantity = quantity
+        self.year = year
+        self.price = price
+        self.currency = currency
+        self.isOWC = isOWC
+        self.isOC = isOC
+        self.isIB = isIB
+        self.bottlesPerCase = bottlesPerCase
+        self.bottleSize = bottleSize
+        self.bottleSizeNumerical = bottleSizeNumerical
+        self.region = region
+        self.subRegion = subRegion
+        self.colour = colour
+        self.createdAt = createdAt
+        self.vendorId = vendorId
+
+
 class wine_db:
-    def __init__(self, filename = "wine.db"):
-        self.columns_transactions = ['purchasorId', 'vendorId', 'type', 'wineName', 'volume', 'quantity', 'pricePrUnit', 'variantCode']
-        self.columns_offers = ['id', 'name', 'lwin', 'vendorId', 'pr', 'cbr']
+    def __init__(self, filename="wine.db"):
+        self.columns_transactions = ['purchasorId', 'vendorId', 'type', 'lwin',
+                                     'wineName', 'volume', 'quantity', 'pricePrUnit', 'variantCode']
+        self.columns_offers = ['id', 'supplierName', 'supplierEmail', 'linkedWineLwin',
+                               'originalOfferText', 'producer', 'wineName',  'quantity',
+                               'year', 'price', 'currency', 'isOWC', 'isOC', 'isIB', 'bottlesPerCase',
+                               'bottleSize', 'bottleSizeNumerical', 'region', 'subRegion', 'colour', 'createdAt', 'vendorId', 'pr', 'cbr']
 
-        self.reopen()
+        self.open_connection()
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS transactions
-                            (purchasorId VARCHAR(5),
-                            vendorId INT NOT NULL,
-                            type VARCHAR(20) NOT NULL,
-                            wineName VARCHAR(100) NOT NULL,
-                            volume VARCHAR(10),
-                            quantity INT NOT NULL,
-                            pricePrUnit REAL NOT NULL,
-                            variantCode INT NOT NULL)''')
-        
-        self.connection.execute('''CREATE TABLE IF NOT EXISTS offers 
-                            (id INT NOT NULL PRIMARY KEY,
-                            name VARCHAR(100) NOT NULL, 
-                            lwin INT NOT NULL,
-                            vendorId INT NOT NULL, 
-                            pr INT,
-                            cbr INT)''')
+                                    (vendorId INT NOT NULL,
+                                    postingGroup VARCHAR(20) NOT NULL,
+                                    number VARCHAR(20) NOT NULL,
+                                    lwinnumber VARCHAR(20),
+                                    description VARCHAR(20),
+                                    measurementunit VARCHAR(20),
+                                    quantity REAL,
+                                    directunitcost REAL,
+                                    amount REAL,
+                                    variantcode INT,
+                                    postingdate VARCHAR(20),
+                                    purchaseinitials VARCHAR(5))''')
+
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS offers
+                                    (id VARCHAR(50),
+                                    supplierName VARCHAR(30),
+                                    supplierEmail VARCHAR(100),
+                                    linkedWineLwin VARCHAR(50),
+                                    originalOfferText VARCHAR(100),
+                                    producer VARCHAR(30),
+                                    wineName VARCHAR(100),
+                                    quantity INT,
+                                    year INT,
+                                    price REAL,
+                                    currency VARCHAR(10),
+                                    isOWC BOOL,
+                                    isOC BOOL,
+                                    isIB BOOL,
+                                    bottlesPerCase INT,
+                                    bottleSize VARCHAR(30),
+                                    bottleSizeNumerical INT,
+                                    region VARCHAR(30),
+                                    subRegion VARCHAR(30),
+                                    colour VARCHAR(30),
+                                    createdAt VARCHAR(30),
+                                    vendorId VARCHAR(50))''')
         self.connection.commit()
         self.close()
-    
+
     def __del__(self):
         if (self.connection != None):
             self.connection.close()
 
     # Re-opens database connection.
-    def reopen(self, filename = "wine.db"):
+    def open_connection(self, filename="wine.db"):
         self.connection = sqlite3.connect(filename)
 
     # Closes database.
@@ -44,7 +95,7 @@ class wine_db:
 
     # Checks whether database is empty.
     def empty(self):
-        self.reopen()
+        self.open_connection()
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM offers")
         row = cursor.fetchone()
@@ -52,58 +103,121 @@ class wine_db:
 
         return row == None
 
-    # Adds wine.
-    def add_wine(self, name, lwin, rank, bought, pr, cbr):
-        if (self.connection == None):
-            raise Exception("Wine database is closed.")
-
-        t = (name, lwin, rank, bought, pr, cbr)
-        self.reopen()
-        self.connection.execute("INSERT INTO offers (id, name, lwin, vendorId, pr, cbr) VALUES (" + self.__sql_str_insert(t) + ")")
+    def clear_offers_table(self):
+        self.open_connection()
+        self.connection.execute("DELETE FROM * offers")
         self.connection.commit()
         self.close()
 
-    # Adds several wines.
-    # wines is a pandas dataframe.
-    def add_wines(self, wines):
+    def add_wineoffers(self, sql_wineoffers):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
-        self.reopen()
+        self.open_connection()
 
-        for wine in wines:
-            self.connection.execute("INSERT INTO offers (name, lwin) VALUES (" + self.__sql_str_insert(wine) + ")")
-        
+        for wine in sql_wineoffers:
+            print("Inserting wine: " + wine.wineName + " with ID: " + wine.id)
+            cursor = self.connection.cursor()
+            cursor.execute('''INSERT OR IGNORE INTO offers(
+                                              id,
+                                              supplierName,
+                                              supplierEmail,
+                                              linkedWineLwin,
+                                              originalOfferText,
+                                              producer,
+                                              wineName,
+                                              quantity,
+                                              year,
+                                              price,
+                                              currency,
+                                              isOWC,
+                                              isOC,
+                                              isIB,
+                                              bottlesPerCase,
+                                              bottleSize,
+                                              bottleSizeNumerical,
+                                              region,
+                                              subRegion,
+                                              colour,
+                                              createdAt,
+                                              vendorId)
+                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (wine.id, wine.supplierName, wine.supplierEmail, wine.linkedWineLwin, wine.originalOfferText, wine.producer, wine.wineName, wine.quantity, wine.year, wine.price, wine.currency, wine.isOWC, wine.isOC, wine.isIB, wine.bottlesPerCase, wine.bottleSize, wine.bottleSizeNumerical, wine.region, wine.subRegion, wine.colour, wine.createdAt, wine.vendorId))
+
         self.connection.commit()
         self.close()
 
-    # Returns full string of SQL insertion values.
-    def __sql_str_insert(self, wine_field_tuple):
-        res = ""
-
-        for attribute in wine_field_tuple:
-            if type(attribute) is str:
-                res = res + "'" + attribute + "',"
-
-            else:
-                res = res + str(attribute) + ","
-
-        return res[:len(res) - 1]
-
-    # Returns sorted pandas dataframe.
-    def get_ranked_wines(self):
+    def add_transactions_data(self, transactions):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
-        self.reopen()
-        result = pd.read_sql_query("SELECT * FROM offers ORDER BY pr ASC", self.connection)
-        self.close()
+        self.open_connection()
 
-        return pd.DataFrame(result, columns = self.colums_offers)
+        for transaction in transactions:
+            print("Inserting item: " + transaction['Description'])
+            cursor = self.connection.cursor()
+            cursor.execute('''INSERT OR IGNORE INTO transactions(
+                                              vendorId,
+                                              postingGroup,
+                                              number,
+                                              lwinnumber,
+                                              description,
+                                              measurementunit,
+                                              quantity,
+                                              directunitcost,
+                                              amount,
+                                              variantcode,
+                                              postingdate,
+                                              purchaseinitials
+                                              )
+                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'], transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials']))
 
-    # Clears table of content.
-    def clear_wines(self):
-        self.reopen()
-        self.connection.execute("DELETE FROM offers")
         self.connection.commit()
         self.close()
+
+    def clean_offers_data(self, offer):
+        returnOffer = None
+
+        if offer['wineName'] is None or offer['wineName'] == "":
+            return returnOffer
+
+        if offer['year'] is None or offer['year'] == "":
+            return returnOffer
+
+        if offer['linkedWineLwin'] is None or offer['linkedWineLwin'] == "":
+            return returnOffer
+
+        returnOffer = offer
+        return returnOffer
+
+    def clean_transactions_data(self, transactions):
+        return [i for i in transactions if i['Item description'] != "Certificate"]
+
+
+def main():
+    def load_offers_data():
+        with open('wine_data.json', encoding="utf-8") as offers_data:
+            return json.load(offers_data, strict=False)
+
+    def load_transactions_data():
+        csv_data_df = pd.read_csv('data_with_lwin.csv')
+        return csv_data_df.to_dict(orient='record')
+
+    def create_sqlwine(offer):
+        return SQL_Wineoffer(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
+
+    db = wine_db()
+    wines = []
+    offers_data = load_offers_data()
+
+    for offer in offers_data:
+        current_offer = db.clean_offers_data(offer)
+        if current_offer is not None:
+            wines.append(create_sqlwine(current_offer))
+        db.add_wineoffers(wines)
+
+    transactions_data = load_transactions_data()
+    db.add_transactions_data(transactions_data)
+
+
+if __name__ == '__main__':
+    main()
