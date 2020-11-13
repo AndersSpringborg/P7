@@ -1,60 +1,141 @@
-import React, { useState } from "react";
-import { Table, Tag, Space } from "antd";
+import React, { useEffect, useState } from "react";
+import { Table, Input, Button, Space } from "antd";
+import Highlighter from "react-highlight-words";
+import { SearchOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 export default function OfferTable() {
-  const [wines, setWines] = useState(null);
+  const [wines, setWines] = useState<any[]>([]);
+
+  const apiURL = "http://localhost:5000/GetWinesFromTimestamp/2018";
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const response = await axios.get(apiURL);
+
+    setWines(response.data);
+    console.log(response.data);
+
+    return response.data;
+  };
+
+  const state = {
+    searchText: "",
+    searchedColumn: "",
+  };
+
+  const [searchState, setSearchState] = useState<{
+    searchText: any;
+    searchedColumn: any;
+  }>();
+  const [searchInput, setSearchInput] = useState<any>(null);
+
+  const getColumnSearchProps = (dataIndex: any, key?: any) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }: any) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={(node) => {
+            setSearchInput(node);
+          }}
+          placeholder={`Search ${key ? key : dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ width: 188, marginBottom: 8, display: "block" }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: any) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value: any, record: any) =>
+      record[dataIndex]
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        : "",
+    onFilterDropdownVisibleChange: (visible: any) => {
+      if (visible) {
+        setTimeout(() => searchInput?.select(), 100);
+      }
+    },
+    render: (text: string) =>
+      searchState?.searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          searchWords={[state.searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
+    confirm();
+    setSearchState({
+      searchText: selectedKeys[0],
+      searchedColumn: dataIndex,
+    });
+  };
+
+  const handleReset = (clearFilters: any) => {
+    clearFilters();
+    setSearchState({ searchText: "", searchedColumn: "" });
+  };
 
   const columns = [
     {
       title: "Wine Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text: string) => <a>{text}</a>,
+      dataIndex: "wineName",
+      key: "wineName",
+      width: "30%",
+      ...getColumnSearchProps("wineName", "wine name"),
     },
     {
       title: "Year",
-      dataIndex: "age",
-      key: "age",
+      dataIndex: "year",
+      key: "year",
+      width: "20%",
+      ...getColumnSearchProps("year"),
     },
     {
       title: "Price",
-      dataIndex: "address",
-      key: "address",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text: string, record: any) => (
-        <Space size="middle">
-          <a>See More</a>
-        </Space>
-      ),
+      dataIndex: "price",
+      key: "price",
+      ...getColumnSearchProps("price"),
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-      tags: ["nice", "developer"],
-    },
-    {
-      key: "2",
-      name: "Jim Green",
-      age: 42,
-      address: "London No. 1 Lake Park",
-      tags: ["loser"],
-    },
-    {
-      key: "3",
-      name: "Joe Black",
-      age: 32,
-      address: "Sidney No. 1 Lake Park",
-      tags: ["cool", "teacher"],
-    },
-  ];
-
-  return <Table columns={columns} dataSource={data} />;
+  return <Table columns={columns} dataSource={wines} />;
 }
