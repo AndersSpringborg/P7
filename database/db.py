@@ -139,7 +139,7 @@ class wine_db:
         self.open_connection()
         self.connection.execute("DELETE FROM * offers")
         self.connection.commit()
-        self.close()
+        self.connection.close()
 
     def add_wineoffers(self, sql_wineoffers):
         if (self.connection == None):
