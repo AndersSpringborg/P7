@@ -3,6 +3,7 @@ import "./wine-offer-list.scss";
 import { Layout, Menu, Image } from "antd";
 import { UnorderedListOutlined } from "@ant-design/icons";
 import OfferTable from "./offer-table/offer-table";
+import logo from "./../images/worstlogo.png";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -21,12 +22,9 @@ export default class WineOfferList extends Component {
       <Layout style={{ minHeight: "100vh" }}>
         <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
           <div className="logo">
-            <Image
-              src="https://ichef.bbci.co.uk/news/1024/cpsprodpb/124C/production/_93648640_ant.jpg"
-              alt="ant image"
-            />
+            <Image src={logo} alt="ant image" />
           </div>
-          <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
+          <Menu theme="dark" mode="inline">
             <Menu.Item key="1" icon={<UnorderedListOutlined />}>
               Recommendations
             </Menu.Item>
@@ -44,7 +42,7 @@ export default class WineOfferList extends Component {
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>
-            Ant Design ©2018 Created by Ant UED
+            WORST (Wine Offer Recommender System for Traders) 2020©
           </Footer>
         </Layout>
       </Layout>

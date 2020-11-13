@@ -119,21 +119,41 @@ export default function OfferTable() {
       title: "Wine Name",
       dataIndex: "wineName",
       key: "wineName",
-      width: "30%",
+      width: "50%",
       ...getColumnSearchProps("wineName", "wine name"),
     },
     {
       title: "Year",
       dataIndex: "year",
       key: "year",
-      width: "20%",
+      sorter: (a: any, b: any) => a.year - b.year,
       ...getColumnSearchProps("year"),
     },
     {
       title: "Price",
       dataIndex: "price",
       key: "price",
+      width: "10%",
+      sorter: (a: any, b: any) => a.price - b.price,
       ...getColumnSearchProps("price"),
+    },
+    {
+      title: "Currency",
+      dataIndex: "currency",
+      filters: [
+        {
+          text: "€",
+          value: "€",
+        },
+        {
+          text: "$",
+          value: "$",
+        },
+      ],
+      key: "currency",
+      onFilter: (value: any, record: any) =>
+        record.currency.indexOf(value) === 0,
+      width: "10%",
     },
   ];
 
