@@ -32,12 +32,6 @@ class SQL_Wineoffer:
 
 class wine_db:
     def __init__(self, filename="wine.db"):
-        self.columns_transactions = ['purchasorId', 'vendorId', 'type', 'lwin',
-                                     'wineName', 'volume', 'quantity', 'pricePrUnit', 'variantCode']
-        self.columns_offers = ['id', 'supplierName', 'supplierEmail', 'linkedWineLwin',
-                               'originalOfferText', 'producer', 'wineName',  'quantity',
-                               'year', 'price', 'currency', 'isOWC', 'isOC', 'isIB', 'bottlesPerCase',
-                               'bottleSize', 'bottleSizeNumerical', 'region', 'subRegion', 'colour', 'createdAt', 'vendorId', 'pr', 'cbr']
 
         self.open_connection()
 
@@ -79,32 +73,24 @@ class wine_db:
                                     createdAt DATETIME,
                                     vendorId VARCHAR(50))''')
         self.connection.commit()
-        self.close()
+        self.connection.close()
 
     def __del__(self):
         if (self.connection != None):
             self.connection.close()
 
-    # Re-opens database connection.
     def open_connection(self, filename="wine.db"):
         self.connection = sqlite3.connect(filename)
 
-    # Closes database.
-    def close(self):
-        if (self.connection != None):
-            self.connection.close()
-
-    # Checks whether database is empty.
     def empty(self):
         self.open_connection()
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM offers")
         row = cursor.fetchone()
-        self.close()
+        self.connection.close()
 
         return row == None
 
-    # Retrieves all entries from the offers table.
     def get_all_offers(self):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -120,7 +106,6 @@ class wine_db:
 
         return json.dumps([dict(ix) for ix in rows])
 
-    # Retrieves all entries from the transactions table.
     def get_all_transactions(self):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -131,9 +116,10 @@ class wine_db:
         c = self.connection.cursor()
         rows = c.execute('select * from transactions').fetchall()
 
+        self.connection.close()
+
         return json.dumps([dict(ix) for ix in rows])
 
-    # Retrieves offers after a given timestamp.
     def get_offers_from_timestamp(self, timestamp):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -144,6 +130,8 @@ class wine_db:
         c = self.connection.cursor()
         rows = c.execute(
             "SELECT * FROM offers WHERE createdAt>=?;", [timestamp]).fetchall()
+
+        self.connection.close()
 
         return flask.jsonify([dict(ix) for ix in rows])
 
@@ -189,7 +177,7 @@ class wine_db:
                                               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (wine.id, wine.supplierName, wine.supplierEmail, wine.linkedWineLwin, wine.originalOfferText, wine.producer, wine.wineName, wine.quantity, wine.year, wine.price, wine.currency, wine.isOWC, wine.isOC, wine.isIB, wine.bottlesPerCase, wine.bottleSize, wine.bottleSizeNumerical, wine.region, wine.subRegion, wine.colour, wine.createdAt, wine.vendorId))
 
         self.connection.commit()
-        self.close()
+        self.connection.close()
 
     def add_transactions_data(self, transactions):
         if (self.connection == None):
@@ -218,7 +206,7 @@ class wine_db:
                                               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'], transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials']))
 
         self.connection.commit()
-        self.close()
+        self.connection.close()
 
     def clean_offers_data(self, offer):
         returnOffer = None
@@ -252,33 +240,19 @@ def main():
         return SQL_Wineoffer(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
 
     db = wine_db()
-    wines = []
-    offers_data = load_offers_data()
 
-    # Inserting offers
+    offers_data = load_offers_data()
+    transactions_data = load_transactions_data()
+
+    wines = []
     for offer in offers_data:
         current_offer = db.clean_offers_data(offer)
         if current_offer is not None:
             wines.append(create_sqlwine(current_offer))
 
     db.add_wineoffers(wines)
-
-    # Inserting transcations
-    transactions_data = load_transactions_data()
     db.add_transactions_data(
         db.clean_transactions_data(transactions_data))
-
-    # Pretty print get all offers
-    json_object = json.loads(db.get_all_offers())
-    offers_formated_json = json.dumps(json_object, indent=2)
-    print(offers_formated_json)
-
-    # Pretty print get all offers from timestamp
-    json_object = json.loads(
-        db.get_offers_from_timestamp('2020-02-01'))
-
-    offers_from_timestamp_formated_json = json.dumps(json_object, indent=2)
-    print(offers_from_timestamp_formated_json)
 
 
 if __name__ == '__main__':
