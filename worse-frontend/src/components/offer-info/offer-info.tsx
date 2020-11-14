@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
-import { Table, Input, Button, Space, Row, Col, Divider, Spin } from "antd";
-import Highlighter from "react-highlight-words";
-import { LeftCircleOutlined, LeftOutlined } from "@ant-design/icons";
+import { Row, Col, Divider, Spin } from "antd";
+import { LeftCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-info.scss";
-import Form, { useForm } from "antd/lib/form/Form";
 
 export default function OfferTable() {
   const [wines, setWines] = useState<WineOffer[]>([]);
