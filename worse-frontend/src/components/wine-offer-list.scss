@@ -14,9 +14,15 @@
   display: flex;
   justify-content: center;
   margin: 20px;
-  font-family: "Xanh Mono", monospace;
+  font-family: "Quicksand", sans-serif;
 }
 
 .menuItem {
-  font-family: "Xanh Mono", monospace;
+  font-family: "Quicksand", sans-serif;
+}
+
+.juleKnap {
+  position: fixed;
+  top: 650px;
+  left: 40%;
 }

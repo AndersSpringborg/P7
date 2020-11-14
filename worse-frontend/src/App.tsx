@@ -4,7 +4,7 @@ import history from "./history";
 import "./App.css";
 import WineOfferList from "./components/wine-offer-list";
 import OfferTable from "./components/offer-table/offer-table";
-import WineInfo from "./components/offer-table/wine-offer-page/wine-offer-info";
+import WineInfo from "./components/offer-info/offer-info";
 
 function App() {
   return (

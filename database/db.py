@@ -135,6 +135,21 @@ class wine_db:
 
         return flask.jsonify([dict(ix) for ix in rows])
 
+    def get_offer_by_id(self, id):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute(
+            "SELECT * FROM offers WHERE id=?;", [id]).fetchall()
+
+        self.connection.close()
+
+        return flask.jsonify([dict(ix) for ix in rows])
+
     def clear_offers_table(self):
         self.open_connection()
         self.connection.execute("DELETE FROM * offers")
