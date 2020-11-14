@@ -61,106 +61,112 @@ export default function OfferTable() {
               </Col>
             </Row>
             <div style={{ height: "60px" }}></div>
-            <Row justify="center">
-              <Col style={{ width: "100vh" }}>
-                <h1 className="header2Text">Wine</h1>
-                <Col>
-                  <Row>
-                    <span className="text">
-                      Wine name: {wines[0]?.wineName}
-                    </span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">Producer: {wines[0]?.producer}</span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">Region: {wines[0]?.region}</span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      Sub Region: {wines[0]?.subRegion}
-                    </span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">Year: {wines[0]?.year}</span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">Colour: {wines[0]?.colour}</span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      LWIN: {wines[0]?.linkedWineLwin}
-                    </span>
-                  </Row>
+            <Row style={{ justifyContent: "center" }}>
+              <Row justify="center">
+                <Col style={{ width: "40vh" }}>
+                  <h1 className="header2Text">Wine</h1>
+                  <Col>
+                    <Row>
+                      <span className="text">
+                        Wine name: {wines[0]?.wineName}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Producer: {wines[0]?.producer}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">Region: {wines[0]?.region}</span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Sub Region: {wines[0]?.subRegion}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">Year: {wines[0]?.year}</span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">Colour: {wines[0]?.colour}</span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        LWIN: {wines[0]?.linkedWineLwin}
+                      </span>
+                    </Row>
+                  </Col>
                 </Col>
-              </Col>
-            </Row>
-            <div style={{ height: "60px" }}></div>
-            <Row justify="center">
-              <Col style={{ width: "100vh" }}>
-                <h1 className="header2Text">Packaging</h1>
-                <Col>
-                  <Row>
-                    <span className="text">
-                      Package Feaures: {wines[0]?.isOWC} {wines[0]?.isOC}{" "}
-                      {wines[0]?.isIB}
-                    </span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      Bottles per case: {wines[0]?.bottlesPerCase}
-                    </span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      Bottle size: {wines[0]?.bottleSize}
-                    </span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      Bottle size (numerical): {wines[0]?.bottleSizeNumerical}
-                    </span>
-                  </Row>
+              </Row>
+              <div style={{ width: "110px" }}></div>
+              <Row justify="center">
+                <Col style={{ width: "40vh" }}>
+                  <h1 className="header2Text">Packaging</h1>
+                  <Col>
+                    <Row>
+                      <span className="text">
+                        Package Feaures: {wines[0]?.isOWC} {wines[0]?.isOC}{" "}
+                        {wines[0]?.isIB}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Bottles per case: {wines[0]?.bottlesPerCase}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Bottle size: {wines[0]?.bottleSize}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Bottle size (numerical): {wines[0]?.bottleSizeNumerical}
+                      </span>
+                    </Row>
+                  </Col>
                 </Col>
-              </Col>
-            </Row>
-            <div style={{ height: "60px" }}></div>
-            <Row justify="center">
-              <Col style={{ width: "100vh" }}>
-                <h1 className="header2Text">Supplier & Offer</h1>
-                <Col>
-                  <Row>
-                    <span className="text">Name: {wines[0]?.supplierName}</span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      Email: {wines[0]?.supplierEmail}
-                    </span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      Original offer text: {wines[0]?.originalOfferText}
-                    </span>
-                  </Row>
-                  <Divider />
-                  <Row>
-                    <span className="text">
-                      Created at: {wines[0]?.createdAt}
-                    </span>
-                  </Row>
+              </Row>
+              <div style={{ width: "110px" }}></div>
+              <Row justify="center">
+                <Col style={{ width: "40vh" }}>
+                  <h1 className="header2Text">Supplier & Offer</h1>
+                  <Col>
+                    <Row>
+                      <span className="text">
+                        Name: {wines[0]?.supplierName}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Email: {wines[0]?.supplierEmail}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Original offer text: {wines[0]?.originalOfferText}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Created at: {wines[0]?.createdAt}
+                      </span>
+                    </Row>
+                  </Col>
                 </Col>
-              </Col>
+              </Row>
             </Row>
             <div style={{ height: "60px" }}></div>
           </div>

@@ -1,14 +1,12 @@
 import React, { Component } from "react";
 import "./wine-offer-list.scss";
-import { Layout, Menu, Image, Button, Switch } from "antd";
+import { Layout, Menu, Image, Switch } from "antd";
 import { UnorderedListOutlined } from "@ant-design/icons";
-import OfferTable from "./offer-table/offer-table";
 import juleLogo from "./../images/worstlogo1.png";
 import logo from "./../images/worstlogo.png";
 import christmaslights from "./../images/christmaslight.png";
-import { useParams } from "react-router";
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Footer, Sider } = Layout;
 
 export default class WineOfferList extends Component {
   state = {
