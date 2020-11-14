@@ -20,6 +20,12 @@ def sample_get():
 def get_offers_from_timestamp(arg):
     return testdb.get_offers_from_timestamp(arg)
 
+
+@app.route('/GetOfferById/<arg>', methods=['GET'])
+def get_offer_by_id(arg):
+    return testdb.get_offer_by_id(arg)
+
+
 # This defines a simple get request in sub directory 'sub', where 'arg' is an argument.
 
 
