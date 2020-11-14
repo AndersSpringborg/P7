@@ -1,8 +1,10 @@
 import db
 import flask as flask
+from flask_cors import CORS
 
 
 app = flask.Flask(__name__)
+CORS(app)
 testdb = db.wine_db()
 # This defines a simple get request from root.
 
