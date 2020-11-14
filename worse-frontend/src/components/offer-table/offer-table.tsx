@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Table, Input, Button, Space } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { Content } from "antd/lib/layout/layout";
 
 export default function OfferTable() {
   const [wines, setWines] = useState<any[]>([]);
@@ -21,6 +23,12 @@ export default function OfferTable() {
 
     return response.data;
   };
+
+  let history = useHistory();
+
+  function handleRowClick(id: string) {
+    history.push(`/wineOffer/${id}`);
+  }
 
   const state = {
     searchText: "",
@@ -116,6 +124,12 @@ export default function OfferTable() {
 
   const columns = [
     {
+      title: "Id",
+      dataIndex: "id",
+      key: "id",
+      ...getColumnSearchProps("id"),
+    },
+    {
       title: "Wine Name",
       dataIndex: "wineName",
       key: "wineName",
@@ -157,5 +171,29 @@ export default function OfferTable() {
     },
   ];
 
-  return <Table columns={columns} dataSource={wines} />;
+  return (
+    <Content style={{ margin: "0 16px" }}>
+      <div className="headerText"> Wine Offer Recommendations </div>
+      <div
+        className="site-layout-background"
+        style={{ padding: 24, minHeight: 360 }}
+      >
+        <Table
+          columns={columns}
+          dataSource={wines}
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: (event) => {
+                return handleRowClick(record.id);
+              }, // click row
+              onDoubleClick: (event) => {}, // double click row
+              onContextMenu: (event) => {}, // right button click row
+              onMouseEnter: (event) => {}, // mouse enter row
+              onMouseLeave: (event) => {}, // mouse leave row
+            };
+          }}
+        />
+      </div>
+    </Content>
+  );
 }

@@ -24,23 +24,23 @@ export default class WineOfferList extends Component {
           <div className="logo">
             <Image src={logo} alt="ant image" />
           </div>
-          <Menu theme="dark" mode="inline">
-            <Menu.Item key="1" icon={<UnorderedListOutlined />}>
+          <Menu
+            theme="dark"
+            mode="inline"
+            style={{ backgroundColor: "#400000" }}
+          >
+            <Menu.Item
+              className="menuItem"
+              key="1"
+              icon={<UnorderedListOutlined />}
+            >
               Recommendations
             </Menu.Item>
           </Menu>
         </Sider>
         <Layout className="site-layout">
           <Header className="site-layout-background" style={{ padding: 0 }} />
-          <Content style={{ margin: "0 16px" }}>
-            <div className="headerText"> Recommendations </div>
-            <div
-              className="site-layout-background"
-              style={{ padding: 24, minHeight: 360 }}
-            >
-              <OfferTable />
-            </div>
-          </Content>
+          {this.props.children}
           <Footer style={{ textAlign: "center" }}>
             WORST (Wine Offer Recommender System for Traders) 2020©
           </Footer>

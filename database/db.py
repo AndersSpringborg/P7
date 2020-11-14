@@ -5,8 +5,8 @@ import flask as flask
 
 
 class SQL_Wineoffer:
-    def __init__(self, wine_id, supplierName, supplierEmail, linkedWineLwin, originalOfferText, producer, wineName, quantity, year, price, currency, isOWC, isOC, isIB, bottlesPerCase, bottleSize, bottleSizeNumerical, region, subRegion, colour, createdAt, vendorId):
-        self.id = wine_id
+    def __init__(self, offerId, supplierName, supplierEmail, linkedWineLwin, originalOfferText, producer, wineName, quantity, year, price, currency, isOWC, isOC, isIB, bottlesPerCase, bottleSize, bottleSizeNumerical, region, subRegion, colour, createdAt, wine_id):
+        self.offerId = offerId
         self.supplierName = supplierName
         self.supplierEmail = supplierEmail
         self.linkedWineLwin = linkedWineLwin
@@ -27,7 +27,7 @@ class SQL_Wineoffer:
         self.subRegion = subRegion
         self.colour = colour
         self.createdAt = createdAt
-        self.vendorId = vendorId
+        self.id = wine_id
 
 
 class wine_db:
@@ -50,7 +50,7 @@ class wine_db:
                                     purchaseinitials VARCHAR(5))''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS offers
-                                    (id VARCHAR(50),
+                                    (offerId VARCHAR(50),
                                     supplierName VARCHAR(30),
                                     supplierEmail VARCHAR(100),
                                     linkedWineLwin VARCHAR(50),
@@ -71,7 +71,7 @@ class wine_db:
                                     subRegion VARCHAR(30),
                                     colour VARCHAR(30),
                                     createdAt DATETIME,
-                                    vendorId VARCHAR(50))''')
+                                    id VARCHAR(50))''')
         self.connection.commit()
         self.connection.close()
 
@@ -149,10 +149,10 @@ class wine_db:
 
         for wine in sql_wineoffers:
             print("Inserting wine: " + wine.originalOfferText +
-                  " with ID: " + wine.id)
+                  " with ID: " + wine.offerId)
             cursor = self.connection.cursor()
             cursor.execute('''INSERT OR IGNORE INTO offers(
-                                              id,
+                                              offerId,
                                               supplierName,
                                               supplierEmail,
                                               linkedWineLwin,
@@ -173,8 +173,8 @@ class wine_db:
                                               subRegion,
                                               colour,
                                               createdAt,
-                                              vendorId)
-                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (wine.id, wine.supplierName, wine.supplierEmail, wine.linkedWineLwin, wine.originalOfferText, wine.producer, wine.wineName, wine.quantity, wine.year, wine.price, wine.currency, wine.isOWC, wine.isOC, wine.isIB, wine.bottlesPerCase, wine.bottleSize, wine.bottleSizeNumerical, wine.region, wine.subRegion, wine.colour, wine.createdAt, wine.vendorId))
+                                              id)
+                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (wine.offerId, wine.supplierName, wine.supplierEmail, wine.linkedWineLwin, wine.originalOfferText, wine.producer, wine.wineName, wine.quantity, wine.year, wine.price, wine.currency, wine.isOWC, wine.isOC, wine.isIB, wine.bottlesPerCase, wine.bottleSize, wine.bottleSizeNumerical, wine.region, wine.subRegion, wine.colour, wine.createdAt, wine.id))
 
         self.connection.commit()
         self.connection.close()
@@ -232,9 +232,9 @@ def main():
         with open('test_offers.json', encoding="utf-8") as offers_data:
             return json.load(offers_data, strict=False)
 
-    def load_transactions_data():
-        csv_data_df = pd.read_csv('test_trans.csv')
-        return csv_data_df.to_dict(orient='record')
+    # def load_transactions_data():
+        #csv_data_df = pd.read_csv('test_trans.csv')
+        # return csv_data_df.to_dict(orient='record')
 
     def create_sqlwine(offer):
         return SQL_Wineoffer(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
@@ -242,7 +242,7 @@ def main():
     db = wine_db()
 
     offers_data = load_offers_data()
-    transactions_data = load_transactions_data()
+    #transactions_data = load_transactions_data()
 
     wines = []
     for offer in offers_data:
@@ -251,8 +251,8 @@ def main():
             wines.append(create_sqlwine(current_offer))
 
     db.add_wineoffers(wines)
-    db.add_transactions_data(
-        db.clean_transactions_data(transactions_data))
+    # db.add_transactions_data(
+    # db.clean_transactions_data(transactions_data))
 
 
 if __name__ == '__main__':
