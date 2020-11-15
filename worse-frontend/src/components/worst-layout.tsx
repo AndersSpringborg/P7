@@ -1,14 +1,15 @@
-import React, { Children, useState } from "react";
-import "./wine-offer-list.scss";
+import React, { useState } from "react";
+import "./worst-layout.scss";
 import { Layout, Menu, Image, Switch } from "antd";
 import { UnorderedListOutlined } from "@ant-design/icons";
 import juleLogo from "./../images/worstlogo1.png";
 import logo from "./../images/worstlogo.png";
 import christmaslights from "./../images/christmaslight.png";
+import { useHistory } from "react-router-dom";
 
 const { Header, Footer, Sider } = Layout;
 
-export default function WineOfferList (props: any) {
+export default function WorstLayout (props: any) {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [juled, setJuled] = useState<boolean>(false);
 
@@ -19,6 +20,16 @@ export default function WineOfferList (props: any) {
   const onJule = () => {
     juled? (setJuled(false)) : (setJuled(true));
   };
+
+  let history = useHistory();
+
+  const handleTransactionClick = () => {
+    history.push(`/transactions`);
+  }
+
+  const handleOfferClick = () => {
+    history.push(`/`);
+  }
 
     return (
       <Layout style={{ minHeight: "100vh" }}>
@@ -31,10 +42,10 @@ export default function WineOfferList (props: any) {
             )}
           </div>
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            <Menu.Item key="1" icon={<UnorderedListOutlined />}>
+            <Menu.Item key="1" icon={<UnorderedListOutlined />} onClick={handleOfferClick}>
               Offers
             </Menu.Item>
-            <Menu.Item key="2" icon={<UnorderedListOutlined />}>
+            <Menu.Item key="2" icon={<UnorderedListOutlined />} onClick={handleTransactionClick}>
               Transactions
             </Menu.Item>
           </Menu>
