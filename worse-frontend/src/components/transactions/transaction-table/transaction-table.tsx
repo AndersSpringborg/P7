@@ -9,7 +9,7 @@ import { Content } from "antd/lib/layout/layout";
 export default function TransactionTable() {
   const [wines, setWines] = useState<any[]>([]);
 
-  const apiURL = "http://localhost:5000/GetWinesFromTimestamp/2018";
+  const apiURL = "http://localhost:5000/GetAllTransactions";
 
   useEffect(() => {
     fetchData();
@@ -124,50 +124,32 @@ export default function TransactionTable() {
 
   const columns = [
     {
-      title: "Id",
-      dataIndex: "id",
-      key: "id",
-      ...getColumnSearchProps("id"),
+      title: "Vendor Id",
+      dataIndex: "vendorId",
+      key: "vendorId",
+      ...getColumnSearchProps("vendorId", "vendor id"),
     },
     {
-      title: "Wine Name",
-      dataIndex: "wineName",
-      key: "wineName",
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
       width: "50%",
-      ...getColumnSearchProps("wineName", "wine name"),
+      ...getColumnSearchProps("description"),
     },
     {
-      title: "Year",
-      dataIndex: "year",
-      key: "year",
-      sorter: (a: any, b: any) => a.year - b.year,
-      ...getColumnSearchProps("year"),
+      title: "LWIN",
+      dataIndex: "lwinnumber",
+      key: "lwinnumber",
+      sorter: (a: any, b: any) => a.lwinnumber - b.lwinnumber,
+      ...getColumnSearchProps("lwinnumber"),
     },
     {
       title: "Price",
-      dataIndex: "price",
-      key: "price",
+      dataIndex: "amount",
+      key: "amount",
       width: "10%",
-      sorter: (a: any, b: any) => a.price - b.price,
-      ...getColumnSearchProps("price"),
-    },
-    {
-      title: "Currency",
-      dataIndex: "currency",
-      filters: [
-        {
-          text: "€",
-          value: "€",
-        },
-        {
-          text: "$",
-          value: "$",
-        },
-      ],
-      key: "currency",
-      onFilter: (value: any, record: any) =>
-        record.currency.indexOf(value) === 0,
-      width: "10%",
+      sorter: (a: any, b: any) => a.amount - b.amount,
+      ...getColumnSearchProps("amount"),
     },
   ];
 
