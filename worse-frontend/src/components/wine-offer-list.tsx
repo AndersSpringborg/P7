@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Children, useState } from "react";
 import "./wine-offer-list.scss";
 import { Layout, Menu, Image, Switch } from "antd";
 import { UnorderedListOutlined } from "@ant-design/icons";
@@ -8,51 +8,41 @@ import christmaslights from "./../images/christmaslight.png";
 
 const { Header, Footer, Sider } = Layout;
 
-export default class WineOfferList extends Component {
-  state = {
-    collapsed: false,
-    juled: false,
+export default function WineOfferList (props: any) {
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [juled, setJuled] = useState<boolean>(false);
+
+  const onCollapse = () => {
+    collapsed? (setCollapsed(false)) : (setCollapsed(true));
   };
 
-  onCollapse = (collapsed: any) => {
-    this.setState({ collapsed });
+  const onJule = () => {
+    juled? (setJuled(false)) : (setJuled(true));
   };
-
-  onJule = (juled: any) => {
-    this.setState({ juled });
-  };
-
-  render() {
-    const { collapsed } = this.state;
 
     return (
       <Layout style={{ minHeight: "100vh" }}>
-        <Sider collapsible collapsed={collapsed} onCollapse={this.onCollapse}>
+        <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
           <div className="logo">
-            {this.state.juled ? (
+            {juled ? (
               <Image className="juleimg" src={juleLogo} alt="ant image" />
             ) : (
               <Image className="juleimg" src={logo} alt="ant image" />
             )}
           </div>
-          <Menu
-            theme="dark"
-            mode="inline"
-            style={{ backgroundColor: "#400000" }}
-          >
-            <Menu.Item
-              className="menuItem"
-              key="1"
-              icon={<UnorderedListOutlined />}
-            >
-              Recommendations
+          <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+            <Menu.Item key="1" icon={<UnorderedListOutlined />}>
+              Offers
+            </Menu.Item>
+            <Menu.Item key="2" icon={<UnorderedListOutlined />}>
+              Transactions
             </Menu.Item>
           </Menu>
-          <Switch className="juleKnap" onChange={this.onJule} />
+          <Switch className="juleKnap" onChange={onJule} />
         </Sider>
         <Layout className="site-layout">
           <Header className="site-layout-background" style={{ padding: 0 }}>
-            {this.state.juled ? (
+            {juled ? (
               <Image
                 className="juleimg"
                 src={christmaslights}
@@ -62,12 +52,14 @@ export default class WineOfferList extends Component {
               <div />
             )}
           </Header>
-          {this.props.children}
+          <div>
+          { props.children  }
+          </div>
           <Footer style={{ textAlign: "center" }}>
             WORST (Wine Offer Recommender System for Traders) 2020©
           </Footer>
         </Layout>
       </Layout>
     );
-  }
+
 }
