@@ -1,46 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Table, Input, Button, Space } from "antd";
+import { Table, Input, Button, Space, Spin } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
+import "./transaction-table.scss";
 
 export default function TransactionTable() {
-  const [wines, setWines] = useState<any[]>([]);
-
-  const apiURL = "http://localhost:5000/GetAllTransactions";
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    const response = await axios.get(apiURL);
-
-    setWines(response.data);
-    console.log(response.data);
-
-    return response.data;
-  };
-
-  let history = useHistory();
-
-  function handleRowClick(id: string) {
-    history.push(`/wineOffer/${id}`);
-  }
-
-  const state = {
-    searchText: "",
-    searchedColumn: "",
-  };
-
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [searchState, setSearchState] = useState<{
     searchText: any;
     searchedColumn: any;
   }>();
   const [searchInput, setSearchInput] = useState<any>(null);
 
+  // Endpoint for retrieval of the transactions
+  const getTransactionsURL = "http://localhost:5000/GetAllTransactions";
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true)
+    const response = await axios.get(getTransactionsURL);
+
+    setTransactions(response.data);
+    setLoading(false);
+
+    return response.data;
+  };
+
+  let history = useHistory();
+
+  // Handles the routing for accessing a particular transaction page
+  function handleRowClick(id: string) {
+    // TODO: Change the routing when transaction-info page has been implemented
+    history.push(`/wineOffer/${id}`);
+  }
+
+  // Creates the search functionality on the different columns in the transaction table
   const getColumnSearchProps = (dataIndex: any, key?: any) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -100,7 +101,7 @@ export default function TransactionTable() {
       searchState?.searchedColumn === dataIndex ? (
         <Highlighter
           highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[state.searchText]}
+          searchWords={[searchState?.searchText]}
           autoEscape
           textToHighlight={text ? text.toString() : ""}
         />
@@ -122,6 +123,7 @@ export default function TransactionTable() {
     setSearchState({ searchText: "", searchedColumn: "" });
   };
 
+  // Defines the columns for the transaction table
   const columns = [
     {
       title: "Vendor Id",
@@ -160,17 +162,23 @@ export default function TransactionTable() {
         className="site-layout-background"
         style={{ padding: 24, minHeight: 360 }}
       >
-        <Table
-          columns={columns}
-          dataSource={wines}
-          onRow={(record, rowIndex) => {
-            return {
-              onClick: (event) => {
-                return handleRowClick(record.id);
-              }
-            };
-          }}
-        />
+        {loading? (
+          <div className="spin">
+            <Spin size="large" />
+          </div>
+        ):(
+          <Table
+            columns={columns}
+            dataSource={transactions}
+            onRow={(record, rowIndex) => {
+                return {
+                onClick: (event) => {
+                    return handleRowClick(record.id);
+                }
+                };
+            }}
+          />
+        )}
       </div>
     </Content>
   );
