@@ -24,7 +24,7 @@ export default function TransactionTable() {
   }, []);
 
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
     const response = await axios.get(getTransactionsURL);
 
     setTransactions(response.data);
@@ -162,20 +162,21 @@ export default function TransactionTable() {
         className="site-layout-background"
         style={{ padding: 24, minHeight: 360 }}
       >
-        {loading? (
+        {loading ? (
           <div className="spin">
             <Spin size="large" />
           </div>
-        ):(
+        ) : (
           <Table
             columns={columns}
             dataSource={transactions}
             onRow={(record, rowIndex) => {
-                return {
+              return {
                 onClick: (event) => {
-                    return handleRowClick(record.id);
-                }
-                };
+                  console.log(record);
+                  return handleRowClick(record.vendorId);
+                },
+              };
             }}
           />
         )}
