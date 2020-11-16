@@ -17,7 +17,7 @@ export default function OfferTable() {
   const [searchInput, setSearchInput] = useState<any>(null);
 
   // Endpoint for retrieval of the wine offers from after a given timestamp
-  const getOffersURL = "http://localhost:5000/GetWinesFromTimestamp/2018";
+  const getOffersURL = "http://localhost:5000/GetAllOffers";
 
   useEffect(() => {
     fetchData();
@@ -178,11 +178,11 @@ export default function OfferTable() {
         className="site-layout-background"
         style={{ padding: 24, minHeight: 360 }}
       >
-        {loading? (
+        {loading ? (
           <div className="spin">
             <Spin size="large" />
-        </div>
-        ):(
+          </div>
+        ) : (
           <Table
             columns={offerTableColumns}
             dataSource={offers}
@@ -190,7 +190,7 @@ export default function OfferTable() {
               return {
                 onClick: (event) => {
                   return handleRowClick(record.id);
-                }
+                },
               };
             }}
           />
