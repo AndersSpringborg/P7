@@ -246,9 +246,9 @@ def main():
         with open('test_offers.json', encoding="utf-8") as offers_data:
             return json.load(offers_data, strict=False)
 
-    # def load_transactions_data():
-        #csv_data_df = pd.read_csv('test_trans.csv')
-        # return csv_data_df.to_dict(orient='record')
+    def load_transactions_data():
+        csv_data_df = pd.read_csv('test_trans.csv')
+        return csv_data_df.to_dict(orient='record')
 
     def create_sqlwine(offer):
         return SQL_Wineoffer(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
@@ -256,7 +256,7 @@ def main():
     db = wine_db()
 
     offers_data = load_offers_data()
-    #transactions_data = load_transactions_data()
+    transactions_data = load_transactions_data()
 
     wines = []
     for offer in offers_data:
@@ -265,8 +265,8 @@ def main():
             wines.append(create_sqlwine(current_offer))
 
     db.add_wineoffers(wines)
-    # db.add_transactions_data(
-    # db.clean_transactions_data(transactions_data))
+    db.add_transactions_data(
+        db.clean_transactions_data(transactions_data))
 
 
 if __name__ == '__main__':
