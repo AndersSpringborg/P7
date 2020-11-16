@@ -101,10 +101,9 @@ class wine_db:
         c = self.connection.cursor()
         rows = c.execute('select * from offers').fetchall()
 
-        self.connection.commit()
         self.connection.close()
 
-        return json.dumps([dict(ix) for ix in rows])
+        return flask.jsonify([dict(ix) for ix in rows])
 
     def get_all_transactions(self):
         if (self.connection == None):
@@ -118,7 +117,7 @@ class wine_db:
 
         self.connection.close()
 
-        return json.dumps([dict(ix) for ix in rows])
+        return flask.jsonify([dict(ix) for ix in rows])
 
     def get_offers_from_timestamp(self, timestamp):
         if (self.connection == None):
