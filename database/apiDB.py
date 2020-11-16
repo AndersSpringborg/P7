@@ -30,6 +30,11 @@ def get_offer_by_id(arg):
 def get_all_transactions():
     return testdb.get_all_transactions()
 
+
+@app.route('/GetAllOffers', methods=['GET'])
+def get_all_offers():
+    return testdb.get_all_offers()
+
 # This defines a simple get request in sub directory 'sub', where 'arg' is an argument.
 
 
