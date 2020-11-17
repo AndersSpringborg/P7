@@ -189,8 +189,8 @@ class wine_db:
                                               createdAt,
                                               id)
                                               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (wine.offerId, wine.supplierName, wine.supplierEmail, wine.linkedWineLwin, wine.originalOfferText, wine.producer, wine.wineName, wine.quantity, wine.year, wine.price, wine.currency, wine.isOWC, wine.isOC, wine.isIB, wine.bottlesPerCase, wine.bottleSize, wine.bottleSizeNumerical, wine.region, wine.subRegion, wine.colour, wine.createdAt, wine.id))
+            self.connection.commit()
 
-        self.connection.commit()
         self.connection.close()
 
     def add_transactions_data(self, transactions):
@@ -218,8 +218,8 @@ class wine_db:
                                               purchaseinitials
                                               )
                                               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'], transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials']))
+            self.connection.commit()
 
-        self.connection.commit()
         self.connection.close()
 
     def clean_offers_data(self, offer):
