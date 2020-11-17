@@ -1,7 +1,7 @@
+import "./App.less";
 import React from "react";
 import { Router, Switch, Route } from "react-router-dom";
 import history from "./history";
-import "./App.css";
 import WorstLayout from "./components/worst-layout";
 import OfferTable from "./components/offers/offer-table/offer-table";
 import WineInfo from "./components/offers/offer-info/offer-info";
