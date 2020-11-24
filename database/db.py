@@ -30,6 +30,22 @@ class SQL_Wineoffer:
         self.id = wine_id
 
 
+class Transaction_Class:
+    def __init__(self, vendorId, postingGroup, number, lwinnumber, description, measurementunit, quantity, directunitcost, amount, variantcode, postingdate, purchaseinitials):
+        self.vendorId = vendorId
+        self.postingGroup = postingGroup
+        self.number = number
+        self.lwinnumber = lwinnumber
+        self.description = description
+        self.measurementunit = measurementunit
+        self.quantity = quantity
+        self.directunitcost = directunitcost
+        self.amount = amount
+        self.variantcode = variantcode
+        self.postingdate = postingdate
+        self.purchaseinitials = purchaseinitials
+
+
 class wine_db:
     def __init__(self, filename="wine.db"):
 
@@ -149,12 +165,6 @@ class wine_db:
 
         return flask.jsonify([dict(ix) for ix in rows])
 
-    def clear_offers_table(self):
-        self.open_connection()
-        self.connection.execute("DELETE FROM * offers")
-        self.connection.commit()
-        self.connection.close()
-
     def add_wineoffers(self, sql_wineoffers):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -200,8 +210,9 @@ class wine_db:
         self.open_connection()
 
         for transaction in transactions:
-            print("Inserting transaction with description: " +
-                  transaction['Description'])
+            print("Inserting Transaction with description: " +
+                  transaction.description)
+
             cursor = self.connection.cursor()
             cursor.execute('''INSERT OR IGNORE INTO transactions(
                                               vendorId,
@@ -217,7 +228,7 @@ class wine_db:
                                               postingdate,
                                               purchaseinitials
                                               )
-                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'], transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials']))
+                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction.vendorId, transaction.postingGroup, transaction.number, transaction.lwinnumber, transaction.description, transaction.measurementunit, transaction.quantity, transaction.directunitcost, transaction.amount, transaction.variantcode, transaction.postingdate, transaction.purchaseinitials))
             self.connection.commit()
 
         self.connection.close()
@@ -237,8 +248,14 @@ class wine_db:
         returnOffer = offer
         return returnOffer
 
-    def clean_transactions_data(self, transactions):
-        return [i for i in transactions if i['LWIN No_'] != ""]
+    def clean_transactions_data(self, transaction):
+        returnTransaction = None
+
+        if transaction['LWIN No_'] is None or transaction['LWIN No_'] == "":
+            return returnTransaction
+
+        returnTransaction = transaction
+        return returnTransaction
 
 
 def main():
@@ -253,6 +270,10 @@ def main():
     def create_sqlwine(offer):
         return SQL_Wineoffer(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
 
+    def create_transactionobj(transaction):
+        return Transaction_Class(transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'],
+                                 transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'])
+
     db = wine_db()
 
     offers_data = load_offers_data()
@@ -264,9 +285,14 @@ def main():
         if current_offer is not None:
             wines.append(create_sqlwine(current_offer))
 
+    transactions = []
+    for transaction in transactions_data:
+        current_transaction = db.clean_transactions_data(transaction)
+        if current_transaction is not None:
+            transactions.append(create_transactionobj(transaction))
+
     db.add_wineoffers(wines)
-    db.add_transactions_data(
-        db.clean_transactions_data(transactions_data))
+    db.add_transactions_data(transactions)
 
 
 if __name__ == '__main__':
