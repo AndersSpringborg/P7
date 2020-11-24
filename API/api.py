@@ -121,7 +121,7 @@ def interval_post():
         pass
 
     json_data = request.get_json()
-    response = requests.get(DB_DOMAIN + '/interval/' + str(json_data["start"]) + '/' + str(json_data["end"]))
+    response = requests.get(DB_DOMAIN + '/interval/' + str(json_data["Time"]) + '/')
     requests.post(RECOMMENDER_DOMAIN + '/update-model', data = response.text)
     mtx = False
 
@@ -132,10 +132,7 @@ def parse_time_interval(json):
     if 'TimeInterval' not in json:
         return False
 
-    elif 'Start' not in json['TimeInterval'] or 'End' not in json['TimeInterval']:
-        return False
-
-    return True
+    return not ('Start' not in json['TimeInterval'] or 'End' not in json['TimeInterval'] or 'model_type' not in json['TimeInterval'])
 
 # Handles POST request from recommender API to add content into db API.
 @app.route('/db_post', methods = ['POST'])
