@@ -4,7 +4,7 @@ import json
 import flask as flask
 
 
-class SQL_Wineoffer:
+class Offer_Class:
     def __init__(self, offerId, supplierName, supplierEmail, linkedWineLwin, originalOfferText, producer, wineName, quantity, year, price, currency, isOWC, isOC, isIB, bottlesPerCase, bottleSize, bottleSizeNumerical, region, subRegion, colour, createdAt, wine_id):
         self.offerId = offerId
         self.supplierName = supplierName
@@ -257,43 +257,9 @@ class wine_db:
         returnTransaction = transaction
         return returnTransaction
 
+    def create_offer_obj(self, offer):
+        return Offer_Class(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
 
-def main():
-    def load_offers_data():
-        with open('test_offers.json', encoding="utf-8") as offers_data:
-            return json.load(offers_data, strict=False)
-
-    def load_transactions_data():
-        csv_data_df = pd.read_csv('test_trans.csv')
-        return csv_data_df.to_dict(orient='record')
-
-    def create_sqlwine(offer):
-        return SQL_Wineoffer(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
-
-    def create_transactionobj(transaction):
+    def create_transactionobj(self, transaction):
         return Transaction_Class(transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'],
                                  transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'])
-
-    db = wine_db()
-
-    offers_data = load_offers_data()
-    transactions_data = load_transactions_data()
-
-    wines = []
-    for offer in offers_data:
-        current_offer = db.clean_offers_data(offer)
-        if current_offer is not None:
-            wines.append(create_sqlwine(current_offer))
-
-    transactions = []
-    for transaction in transactions_data:
-        current_transaction = db.clean_transactions_data(transaction)
-        if current_transaction is not None:
-            transactions.append(create_transactionobj(transaction))
-
-    db.add_wineoffers(wines)
-    db.add_transactions_data(transactions)
-
-
-if __name__ == '__main__':
-    main()

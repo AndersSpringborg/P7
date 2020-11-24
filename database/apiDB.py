@@ -1,53 +1,72 @@
 import db
 import flask as flask
+from flask import request
 from flask_cors import CORS
-
+import pandas as pd
+import io
 
 app = flask.Flask(__name__)
 CORS(app)
-testdb = db.wine_db()
-# This defines a simple get request from root.
+db = db.wine_db()
 
 
 @app.route('/')
 def sample_get():
     return "Computational Offloading <3!"
 
-# This defines a simple get request in sub directory 'sub'.
+
+@app.route('/AddOffers', methods=['POST'])
+def offers_post():
+    offers = []
+    offers_data = request.get_json()
+
+    for offer in offers_data:
+        current_offer = db.clean_offers_data(offer)
+        if current_offer is not None:
+            offers.append(db.create_offer_obj(current_offer))
+
+    db.add_wineoffers(offers)
+
+    return "Added Wines Succesfully."
 
 
-@app.route('/GetWinesFromTimestamp/<arg>', methods=['GET'])
-def get_offers_from_timestamp(arg):
-    return testdb.get_offers_from_timestamp(arg)
+@app.route('/AddTransactions', methods=['POST'])
+def transactions_post():
+    data = io.StringIO(request.data.decode('UTF-8'))
+    df = pd.read_csv(data)
+
+    transactions_data = df.to_dict(orient='record')
+    transactions = []
+
+    for transaction in transactions_data:
+        current_transaction = db.clean_transactions_data(transaction)
+        if current_transaction is not None:
+            transactions.append(
+                db.create_transactionobj(current_transaction))
+
+    db.add_transactions_data(transactions)
+
+    return "Added Transactions Succesfully."
 
 
-@app.route('/GetOfferById/<arg>', methods=['GET'])
-def get_offer_by_id(arg):
-    return testdb.get_offer_by_id(arg)
-
-
-@app.route('/GetAllTransactions', methods=['GET'])
-def get_all_transactions():
-    return testdb.get_all_transactions()
-
-
-@app.route('/GetAllOffers', methods=['GET'])
+@ app.route('/GetOffers', methods=['GET'])
 def get_all_offers():
-    return testdb.get_all_offers()
-
-# This defines a simple get request in sub directory 'sub', where 'arg' is an argument.
+    return db.get_all_offers()
 
 
-@app.route('/sub/<arg>')
-def sample_get_with_arg(arg):
-    return "Hello, visitor! You entered a sub directory with argument '" + arg + "'."
-
-# This defines a simple post request.
+@ app.route('/GetOffersFromTimestamp/<arg>', methods=['GET'])
+def get_offers_from_timestamp(arg):
+    return db.get_offers_from_timestamp(arg)
 
 
-@app.route('/', methods=['POST'])
-def sample_post():
-    return "You posted '" + request.data + "'."
+@ app.route('/GetOfferById/<arg>', methods=['GET'])
+def get_offer_by_id(arg):
+    return db.get_offer_by_id(arg)
+
+
+@ app.route('/GetTransactions', methods=['GET'])
+def get_all_transactions():
+    return db.get_all_transactions()
 
 
 if (__name__ == "__main__"):
