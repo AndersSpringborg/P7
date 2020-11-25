@@ -143,19 +143,12 @@ class wine_db:
 
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
-        rows_offers = c.execute(
+        rows = c.execute(
             "SELECT * FROM offers WHERE createdAt>=?;", [timestamp]).fetchall()
-        rows_transactions = c.execute(
-            "SELECT * FROM transactions WHERE postingdate>=?;", [timestamp]).fetchall()
 
         self.connection.close()
 
-        merged = {
-            "Transactions": [dict(ix) for ix in rows_transactions],
-            "Offers": [dict(ix) for ix in rows_offers]
-        }
-
-        return flask.jsonify(merged)
+        return flask.jsonify([dict(ix) for ix in rows])
 
     def get_offer_by_id(self, id):
         if (self.connection == None):

@@ -21,7 +21,7 @@ def offers_post():
 
     db.add_wineoffers(offers)
 
-    return "Added Wines Succesfully."
+    return db.get_all_offers()
 
 @app.route('/AddTransactions', methods=['POST'])
 def transactions_post():
