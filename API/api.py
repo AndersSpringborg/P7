@@ -51,7 +51,7 @@ def transactions_post():
     while compare_swap(False, True):
         pass
 
-    response = requests.post(DB_DOMAIN + '/AddTransactions', data = request.get_json())
+    response = requests.post(DB_DOMAIN + '/AddTransactions', json = request.get_json())
     mtx = False
 
     return ""
@@ -68,9 +68,9 @@ def wine_deals_post():
     while compare_swap(False, True):
         pass
 
-    response = requests.post(DB_DOMAIN + '/AddOffers', data = request.data)
-    rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', data = response.text)
-    requests.post(DB_DOMAIN + '/NewRecommendation', data = rec_result.text)
+    response = requests.post(DB_DOMAIN + '/AddOffers', json = request.get_json())
+    rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', json = json.loads(response.text))
+    requests.post(DB_DOMAIN + '/NewRecommendation', json = json.loads(rec_result.text))
     mtx = False
 
     return ""
@@ -90,8 +90,9 @@ def interval_post():
 
     while compare_swap(False, True):
         pass
+
     response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(json_data['TimeInterval']['Time']), headers = {'model-type': json_data['TimeInterval']['model_type']})
-    requests.post(RECOMMENDER_DOMAIN + '/update-model', data = response.text)
+    requests.post(RECOMMENDER_DOMAIN + '/update-model', json = json.loads(response.text))
     mtx = False
 
     return ""
