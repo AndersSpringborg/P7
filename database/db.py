@@ -135,7 +135,7 @@ class wine_db:
 
         return flask.jsonify([dict(ix) for ix in rows])
 
-    def get_offers_from_timestamp(self, timestamp):
+    def get_offers_and_transactions_from_timestamp(self, timestamp):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
@@ -143,12 +143,19 @@ class wine_db:
 
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
-        rows = c.execute(
+        rows_offers = c.execute(
             "SELECT * FROM offers WHERE createdAt>=?;", [timestamp]).fetchall()
+        rows_transactions = c.execute(
+            "SELECT * FROM transactions WHERE postingdate>=?;", [timestamp]).fetchall()
 
         self.connection.close()
 
-        return flask.jsonify([dict(ix) for ix in rows])
+        merged = {
+            "Transactions": [dict(ix) for ix in rows_transactions],
+            "Offers": [dict(ix) for ix in rows_offers]
+        }
+
+        return flask.jsonify(merged)
 
     def get_offer_by_id(self, id):
         if (self.connection == None):
@@ -260,6 +267,6 @@ class wine_db:
     def create_offer_obj(self, offer):
         return Offer_Class(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
 
-    def create_transactionobj(self, transaction):
+    def create_transaction_obj(self, transaction):
         return Transaction_Class(transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'],
                                  transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'])
