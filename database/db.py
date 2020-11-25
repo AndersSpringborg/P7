@@ -135,7 +135,7 @@ class wine_db:
 
         return flask.jsonify([dict(ix) for ix in rows])
 
-    def get_offers_and_transactions_from_timestamp(self, timestamp):
+    def get_all_from_timestamp(self, timestamp):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 

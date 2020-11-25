@@ -9,12 +9,6 @@ app = flask.Flask(__name__)
 CORS(app)
 db = db.wine_db()
 
-
-@app.route('/')
-def sample_get():
-    return "Computational Offloading <3!"
-
-
 @app.route('/AddOffers', methods=['POST'])
 def offers_post():
     offers = []
@@ -28,7 +22,6 @@ def offers_post():
     db.add_wineoffers(offers)
 
     return "Added Wines Succesfully."
-
 
 @app.route('/AddTransactions', methods=['POST'])
 def transactions_post():
@@ -48,26 +41,21 @@ def transactions_post():
 
     return "Added Transactions Succesfully."
 
-
 @ app.route('/GetOffers', methods=['GET'])
 def get_all_offers():
     return db.get_all_offers()
 
-
-@ app.route('/GetOffersFromTimestamp/<arg>', methods=['GET'])
+@ app.route('/GetFromTimestamp/<arg>', methods=['GET'])
 def get_offers_from_timestamp(arg):
-    return db.get_offers_from_timestamp(arg)
-
+    return db.get_all_from_timestamp(arg)
 
 @ app.route('/GetOfferById/<arg>', methods=['GET'])
 def get_offer_by_id(arg):
     return db.get_offer_by_id(arg)
 
-
 @ app.route('/GetTransactions', methods=['GET'])
 def get_all_transactions():
     return db.get_all_transactions()
 
-
 if (__name__ == "__main__"):
-    app.run()
+    app.run(host = '0.0.0.0', port = 49502)
