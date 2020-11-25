@@ -7,8 +7,8 @@ app = Flask(__name__)
 CORS(app)
 mtx = False
 
-DB_DOMAIN = 'worse-db:49502'
-RECOMMENDER_DOMAIN = 'worse-recommender:49501'
+DB_DOMAIN = 'http://worse-db:49502'
+RECOMMENDER_DOMAIN = 'http://worse-recommender:49501'
 
 # Dictionary of tokens for each component.
 tokens = {
@@ -27,13 +27,13 @@ def main_page():
             GET: /recommendation_get/ -> Gets recommended wine deals.'''
 
 # Handles GET request from UI for database content.
-@app.route('/recommendation_get', methods = ['GET'])
+@app.route('/recommendation', methods = ['GET'])
 def db_get():
     if (not 'X-Token' in request.headers) or int(request.headers['X-Token']) != tokens['UI']:
         return make_response('Request not from database', 401)
 
-    response = requests.get('db_url/ranked_data')
-
+    response = requests.get(DB_DOMAIN + '/GetOffers')
+    
     if response.status_code < 200 or response.status_code > 299:
         abort(500)
 
@@ -48,28 +48,13 @@ def transactions_post():
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
         return make_response('Request not from developer', 401)
 
-    elif not parse_transactions(request.get_json()):
-        return make_response('Data couldn\'t be parsed', 400)
-
     while compare_swap(False, True):
         pass
 
-    response = requests.post(DB_DOMAIN + '/transaction/append', data = request.get_json())
+    response = requests.post(DB_DOMAIN + '/AddTransactions', data = request.get_json())
     mtx = False
 
     return ""
-
-# Parses POST request body of transactions.
-def parse_transactions(json):
-    if 'Transactions' not in json:
-        return False
-
-    for transaction in json['Transactions']:
-        # Check for existence of all necessary field.
-        # For example, 'if 'SomeField' not in transaction'.
-        pass
-
-    return True
 
 # Handles POST request from 3rd party to add wine deals data.
 # Retrieves copy of wine deals relation and sends it to recommender API.
@@ -80,48 +65,32 @@ def wine_deals_post():
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
         return make_response('Request not from developer', 401)
 
-    elif not parse_wine_deals(request.get_json()):
-        return make_response('Data couldn\'t be parsed', 400)
-
     while compare_swap(False, True):
         pass
 
-    response = requests.post(DB_DOMAIN + '/wine_deals/append', data = request.get_json())
+    response = requests.post(DB_DOMAIN + '/AddOffers', data = request.data)
     rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', data = response.text)
-    requests.post(DB_DOMAIN + '/wine_deals/recommendation', data = res_result.text)
+    requests.post(DB_DOMAIN + '/NewRecommendation', data = rec_result.text)
     mtx = False
 
     return ""
 
-# Parses POST request body of wine deals.
-def parse_wine_deals(json):
-    if 'WineDeals' not in json:
-        return False
-
-    for wine_deal in json['WineDeals']:
-        # Check for existence of all necessary field.
-        # For example, 'if 'SomeField' not in wine_deal'.
-        pass
-
-    return True
-
 # Handles POST request from 3rd party to set data interval.
 # Retrieves copy of transactions relation and wine deals relation within specified time interval and sends it to recommender API.
-@app.route('/data/interval', methods = ['POST'])
+@app.route('/data/time', methods = ['POST'])
 def interval_post():
     global mtx
+    json_data = json.loads(request.data)
 
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
         return make_response('Request not from developer', 401)
 
-    elif not parse_time_interval(request.get_json()):
+    elif not parse_time_interval(json_data):
         return make_response('Data couldn\'t be parsed', 400)
 
     while compare_swap(False, True):
         pass
-
-    json_data = request.get_json()
-    response = requests.get(DB_DOMAIN + '/interval/' + str(json_data["Time"]) + '/')
+    response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(json_data['TimeInterval']['Time']), headers = {'model-type': json_data['TimeInterval']['model_type']})
     requests.post(RECOMMENDER_DOMAIN + '/update-model', data = response.text)
     mtx = False
 
@@ -132,37 +101,7 @@ def parse_time_interval(json):
     if 'TimeInterval' not in json:
         return False
 
-    return not ('Start' not in json['TimeInterval'] or 'End' not in json['TimeInterval'] or 'model_type' not in json['TimeInterval'])
-
-# Handles POST request from recommender API to add content into db API.
-@app.route('/db_post', methods = ['POST'])
-def output_post():
-    global mtx
-
-    if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['recommender']:
-        return make_response('Request not from recommender', 401)
-
-    elif not parse_recommendation(request.get_json()):
-        return make_response('Data couldn\'t be parsed', 400)
-
-    while compare_swap(False, True):
-        pass
-
-    requests.post(DB_DOMAIN + '/wine_deals/recommendation', data = request.get_json())
-    mtx = False
-
-    return ""
-
-# Parses POST request body of recommendation results.
-def parse_recommendation(json):
-    if 'Results' not in json:
-        return False
-
-    for result in json['Results']:
-        if 'PR' not in result or 'CBR' not in result or 'WineID' not in result:
-            return False
-
-    return True
+    return 'Time' in json['TimeInterval'] and 'model_type' in json['TimeInterval']
 
 # Compare-And-Swap mechanism for busy waiting.
 def compare_swap(expected, new):
