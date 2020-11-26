@@ -47,7 +47,7 @@ def get_all_offers():
 
 @ app.route('/GetFromTimestamp/<arg>', methods=['GET'])
 def get_offers_from_timestamp(arg):
-    return db.get_all_from_timestamp(arg)
+    return db.get_offers_from_timestamp(arg)
 
 @ app.route('/GetOfferById/<arg>', methods=['GET'])
 def get_offer_by_id(arg):
