@@ -7,7 +7,8 @@ app = Flask(__name__)
 CORS(app)
 mtx = False
 
-DB_DOMAIN = 'http://worse-db:49502'
+#DB_DOMAIN = 'http://worse-db:49502'
+DB_DOMAIN = 'http://127.0.0.1:49502'
 RECOMMENDER_DOMAIN = 'http://worse-recommender:49501'
 
 # Dictionary of tokens for each component.
@@ -30,12 +31,12 @@ def main_page():
 @app.route('/recommendation', methods = ['GET'])
 def db_get():
     if (not 'X-Token' in request.headers) or int(request.headers['X-Token']) != tokens['UI']:
-        return make_response('Request not from database', 401)
+        return make_response('Request not from UI component', 401)
 
     response = requests.get(DB_DOMAIN + '/GetOffers')
     
-    if response.status_code < 200 or response.status_code > 299:
-        abort(500)
+    if (int(response.status_code) >= 400):
+        make_response('Database component error', response.status_code)
 
     return response.content
 
@@ -46,14 +47,18 @@ def transactions_post():
     global mtx
 
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
-        return make_response('Request not from developer', 401)
+        return make_response('Request not from developer component', 401)
 
     while compare_swap(False, True):
         pass
 
     response = requests.post(DB_DOMAIN + '/AddTransactions', json = request.get_json())
-    mtx = False
 
+    if (int(response.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', response.status_code)
+
+    mtx = False
     return ""
 
 # Handles POST request from 3rd party to add wine deals data.
@@ -63,16 +68,30 @@ def wine_deals_post():
     global mtx
 
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
-        return make_response('Request not from developer', 401)
+        return make_response('Request not from developer component', 401)
 
     while compare_swap(False, True):
         pass
 
-    response = requests.post(DB_DOMAIN + '/AddOffers', json = request.get_json())
-    rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', json = json.loads(response.text))
-    requests.post(DB_DOMAIN + '/NewRecommendation', json = json.loads(rec_result.text))
-    mtx = False
+    db_response = requests.post(DB_DOMAIN + '/AddOffers', json = request.get_json())
 
+    if (int(db_response.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', db_response.status_code)
+
+    rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', json = json.loads(db_response.text))
+
+    if (int(rec_result.status_code) >= 400):
+        mtx = False
+        make_response('Recommender component error', rec_result.status_code)
+
+    db_result_post = requests.post(DB_DOMAIN + '/NewRecommendation', json = json.loads(rec_result.text))
+
+    if (int(db_result_post.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', db_result_post.status_code)
+
+    mtx = False
     return ""
 
 # Handles POST request from 3rd party to set data interval.
@@ -80,10 +99,10 @@ def wine_deals_post():
 @app.route('/data/time', methods = ['POST'])
 def interval_post():
     global mtx
-    json_data = json.loads(request.data)
+    json_data = request.get_json()
 
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
-        return make_response('Request not from developer', 401)
+        return make_response('Request not from developer component', 401)
 
     elif not parse_time_interval(json_data):
         return make_response('Data couldn\'t be parsed', 400)
@@ -91,10 +110,22 @@ def interval_post():
     while compare_swap(False, True):
         pass
 
-    response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(json_data['TimeInterval']['Time']), headers = {'model-type': json_data['TimeInterval']['model_type']})
-    requests.post(RECOMMENDER_DOMAIN + '/update-model', json = json.loads(response.text))
-    mtx = False
+    get_response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(json_data['TimeInterval']['Time']), headers = {'model-type': json_data['TimeInterval']['model_type']})
+    
+    if (int(get_response.status_code) >= 400):
+        mtx = False
+        return make_response('Database component error', get_response.status_code)
 
+    if (True):
+        return get_response.text
+
+    post_response = requests.post(RECOMMENDER_DOMAIN + '/update-model', json = json.loads(get_response.text))
+
+    if (int(post_response.status_code) >= 400):
+        mtx = False
+        make_response('Recommender component error', post_response.status_code)
+
+    mtx = False
     return ""
 
 # Parses POST request body of time interval.
