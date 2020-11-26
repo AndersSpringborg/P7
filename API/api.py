@@ -7,8 +7,7 @@ app = Flask(__name__)
 CORS(app)
 mtx = False
 
-#DB_DOMAIN = 'http://worse-db:49502'
-DB_DOMAIN = 'http://127.0.0.1:49502'
+DB_DOMAIN = 'http://worse-db:49502'
 RECOMMENDER_DOMAIN = 'http://worse-recommender:49501'
 
 # Dictionary of tokens for each component.
