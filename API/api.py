@@ -116,9 +116,6 @@ def interval_post():
         mtx = False
         return make_response('Database component error', get_response.status_code)
 
-    if (True):
-        return get_response.text
-
     post_response = requests.post(RECOMMENDER_DOMAIN + '/update-model', json = json.loads(get_response.text))
 
     if (int(post_response.status_code) >= 400):
