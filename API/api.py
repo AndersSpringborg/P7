@@ -51,7 +51,7 @@ def transactions_post():
     while compare_swap(False, True):
         pass
 
-    response = requests.post(DB_DOMAIN + '/AddTransactions', json = request.get_json())
+    response = requests.post(DB_DOMAIN + '/AddTransactions', data = io.StringIO(request.data.decode('UTF-8')))
 
     if (int(response.status_code) >= 400):
         mtx = False
