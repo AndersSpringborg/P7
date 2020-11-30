@@ -1,4 +1,4 @@
-![Action Status](https://github.com/MrPekar98/P7/workflows/Contiuous%20integration/badge.svg)
+![Action Status](https://github.com/MrPekar98/P7/workflows/Continuous%20integration/badge.svg)
 
 # P7
 AAU 7th semester project.
