@@ -29,11 +29,11 @@ def add_wine(extracted_wine_obj):
 def save():
     df = pd.DataFrame(wines, columns = list(wines.keys()))
 
-    if (pathlib.Path("wine_data").exists()):
-        df.to_csv("wine_data", mode = 'a', index = False, header = False)
+    if (pathlib.Path("wine_data4001").exists()):
+        df.to_csv("wine_data4001", mode = 'a', index = False, header = False)
 
     else:
-        df.to_csv("wine_data", index = False, header = False)
+        df.to_csv("wine_data4001", index = False, header = False)
 
     key_list = list(wines.keys())
     wines.clear()

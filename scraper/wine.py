@@ -14,6 +14,6 @@ class ExtractedWine:
         self.lwin = lwin
         self.original_year = original_year
         self.year = year
-        self.wine_offer_price
+        self.wine_offer_price = wine_offer_price
         self.price = price
  

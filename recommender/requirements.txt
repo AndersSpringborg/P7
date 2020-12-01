@@ -1,0 +1,7 @@
+pandas
+sklearn
+random
+ast
+pickle
+flask
+flask_cors
