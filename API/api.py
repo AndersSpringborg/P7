@@ -29,15 +29,40 @@ def main_page():
 # Handles GET request from UI for database content.
 @app.route('/recommendation', methods = ['GET'])
 def db_get():
+    global mtx
+
     if (not 'X-Token' in request.headers) or int(request.headers['X-Token']) != tokens['UI']:
         return make_response('Request not from UI component', 401)
+
+    while compare_swap(False, True):
+        pass
 
     response = requests.get(DB_DOMAIN + '/GetOffers')
     
     if (int(response.status_code) >= 400):
+        mtx = False
         make_response('Database component error', response.status_code)
 
+    mtx = False
     return response.content
+
+# Gets single wine by given wine ID.
+@app.route('/wine/<arg>', methods = ['GET'])
+def get_wine(arg):
+    global mtx
+    
+    while compare_swap(False, True):
+        pass
+
+    response = requests.get(DB_DOMAIN + '/GetOfferById/' + str(arg))
+
+    if (int(response.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', response.status_code)
+
+    mtx = False
+    return response.content
+        
 
 # Handles POST request from 3rd party to add transaction data.
 # Appends new transaction data to transactions relation in db.
