@@ -5,6 +5,7 @@ import pandas as pd
 from recommender_class.svm_recommender import SVMrecommender
 from recommender_class.logit_recommender import Logit_recommender
 from recommender_class.nb_recommender import Naive_bayes_recommender
+import exceptions
 
 app = Flask(__name__)
 CORS(app)
@@ -12,7 +13,7 @@ CORS(app)
 #TODO:determine whether supplier name should be included
 #cat_data and num_data are arrays specifying the name of categorical and numerical data in input wine offers, respectively. 
 cat_data = ['region']
-num_data = ['year', 'vintage', 'quantity', 'isOWC', 'isOC', 'isIB', 'price']
+num_data = ['year', 'quantity', 'isOWC', 'isOC', 'isIB', 'price']
 
 @app.route('/')
 def default():
@@ -53,18 +54,20 @@ def update_recommendation():
     if wines == None or model_type == None:
         make_response(jsonify({"status":"data in body not on proper structure. A json string with wine-offers and a specification of model is needed"}), 400)
     wines = pd.read_json(wines, orient='records')
-
-    if model_type == 'svm':
-        recommender = SVMrecommender(wines, cat_data, num_data, False)
-        recommender.recommend()        
-    elif model_type == 'logit':
-        recommender = Logit_recommender(wines, cat_data, num_data, False)
-        recommender.recommend()
-    elif model_type == 'nb':
-        recommender = Naive_bayes_recommender(wines, cat_data, num_data, False)
-        recommender.recommend()
-    else:
-        return make_response(jsonify({"status":"No proper model_type selected. Please choose between 'nb', 'logit' or 'svm'"}), 300)
+    try:
+        if model_type == 'svm':
+            recommender = SVMrecommender(wines, cat_data, num_data, False)
+            recommender.recommend()        
+        elif model_type == 'logit':
+            recommender = Logit_recommender(wines, cat_data, num_data, False)
+            recommender.recommend()
+        elif model_type == 'nb':
+            recommender = Naive_bayes_recommender(wines, cat_data, num_data, False)
+            recommender.recommend()
+        else:
+            return make_response(jsonify({"status":"No proper model_type selected. Please choose between 'nb', 'logit' or 'svm'"}), 300)
+    except exceptions.NoModelException:
+        return make_response(jsonify({"status":"No model for the chosen ML alg has been trained"}), 300)
 
     recommender.output()
     

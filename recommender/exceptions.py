@@ -9,3 +9,6 @@ class ImpossibleTrainException(Exception):
 
 class IncompatibleData(Exception):
     pass
+
+class NoModelException(Exception):
+    pass

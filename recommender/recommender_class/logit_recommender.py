@@ -3,7 +3,7 @@ from sklearn.linear_model import LogisticRegression
 import exceptions
 from sklearn.metrics import accuracy_score
 import pickle
-from os import path
+import exceptions
 
 #class implementing logistic regression
 class Logit_recommender(DefaultRecommender):
@@ -12,12 +12,13 @@ class Logit_recommender(DefaultRecommender):
         super(Logit_recommender,self).__init__(offer_df,cat_attr,num_attr, isTrainable)
 
     def content_based_recommend(self):
-        #TODO: need to make loading of model more dynamic
+        self.check_for_model("models/logit.sav")
+        
         regr = self.load_cb_model("models/logit.sav")
         if not self.isTrainable:
-            x = self.features
+            x = self.feature_to_array()
         else:
-            (x,_) = self.to_input_output_arrays()
+            raise exceptions.ImpossibleTrainException()
 
         #create a new column representing the predictions
         self.offer_df = self.offer_df.assign(cb_outcome= regr.predict(x)) 
@@ -35,4 +36,5 @@ class Logit_recommender(DefaultRecommender):
         self.train_acc = accuracy_score(regressor.predict(train_x),train_y)
         self.test_acc = accuracy_score(regressor.predict(test_x),test_y)
         pickle.dump(regressor, open(path,'wb'))
+
     

@@ -11,6 +11,7 @@ class SVMrecommender(DefaultRecommender):
         super(SVMrecommender,self).__init__(offer_df,cat_attr,num_attr, isTrainable)
 
     def content_based_recommend(self):
+        self.check_for_model("models/svm.sav")
         clf = self.load_cb_model("models/svm.sav")
         if not self.isTrainable:
             x = self.features

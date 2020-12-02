@@ -11,6 +11,7 @@ class Naive_bayes_recommender(DefaultRecommender):
         super(Naive_bayes_recommender,self).__init__(offer_df,cat_attr,num_attr, isTrainable)
 
     def content_based_recommend(self):
+        self.check_for_model("models/nb.sav")
         clf = self.load_cb_model("models/nb.sav")
         if not self.isTrainable:
             x = self.features
@@ -33,3 +34,4 @@ class Naive_bayes_recommender(DefaultRecommender):
         self.train_acc = accuracy_score(clf.predict(train_x),train_y)
         self.test_acc = accuracy_score(clf.predict(test_x),test_y)
         pickle.dump(clf, open(path,'wb'))
+    

@@ -1,6 +1,7 @@
 import pandas as pd
 import random as rand
 import pickle
+from os import path
 
 import exceptions
 
@@ -19,8 +20,8 @@ class DefaultRecommender():
         
         if isTrainable:
             self.train_input = self.to_input_output_arrays()
-        else:
-            self.features = self.feature_to_array()
+        """else:
+            self.features = self.feature_to_array()"""
         
         #fields will contain training and test accuracy when calling save_cb_model
         self.train_acc = None
@@ -146,6 +147,15 @@ class DefaultRecommender():
     #calculates the possible profit for a wine offer in the dataframe 
     def get_profit(self,row):
         return row['globalPrice'] - row['price']
+    
+    #checks whether model serialisation in model_path exists
+    def check_for_model(self, model_path):
+        path_to_parent_dir = path.abspath(path.join(path.dirname(__file__),".."))
+        model_path = path.join( path_to_parent_dir, model_path)
+        if not path.exists(model_path):
+            raise exceptions.NoModelException()
+        else:
+            return
     
     #calculates and return the content-based ranking appended to the wine_offer data
     def cb_ranking(self, df):
