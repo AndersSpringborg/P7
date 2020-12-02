@@ -26,7 +26,7 @@ class SVMrecommender(DefaultRecommender):
     def save_cb_model(self, path):
         clf = svm.SVC()
         if not self.isTrainable:
-            raise exceptions.ImpossibleTrainException("Training is not possible")
+            raise exceptions.ImpossibleTrainException("Training is not possible as the recommender is not in training mode")
         (x,y) = self.to_input_output_arrays()
         split_rate = 0.8
         train_x,train_y,test_x,test_y = self.train_test_split(x, y, split_rate)

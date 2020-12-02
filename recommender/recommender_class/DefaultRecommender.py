@@ -20,8 +20,6 @@ class DefaultRecommender():
         
         if isTrainable:
             self.train_input = self.to_input_output_arrays()
-        """else:
-            self.features = self.feature_to_array()"""
         
         #fields will contain training and test accuracy when calling save_cb_model
         self.train_acc = None

@@ -18,7 +18,7 @@ class Logit_recommender(DefaultRecommender):
         if not self.isTrainable:
             x = self.feature_to_array()
         else:
-            raise exceptions.ImpossibleTrainException()
+            (x,_) = self.to_input_output_arrays()
 
         #create a new column representing the predictions
         self.offer_df = self.offer_df.assign(cb_outcome= regr.predict(x)) 
@@ -27,7 +27,7 @@ class Logit_recommender(DefaultRecommender):
     #save the parameters of the logistic regression after training with the training data
     def save_cb_model(self, path):
         if not self.isTrainable:
-            raise exceptions.ImpossibleTrainException("Training is not possible. Check data")
+            raise exceptions.ImpossibleTrainException("Training is not possible as the recommender is not in training mode")
         (x,y) = self.to_input_output_arrays()
         split_rate = 0.8
         train_x,train_y,test_x,test_y = self.train_test_split(x, y, split_rate)

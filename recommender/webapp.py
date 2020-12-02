@@ -31,18 +31,22 @@ def update():
         return make_response(jsonify({"status":"Input not on proper format"}), 400)
     
     wine_offer_df = pd.read_json(wine_offer, orient='records')
-        
-    if model_type == "svm":
-        recommender = SVMrecommender(wine_offer_df, cat_data, num_data, True)
-        recommender.save_cb_model("models/svm.sav")
-    elif model_type == "logit":
-        recommender = Logit_recommender(wine_offer_df, cat_data, num_data, True)
-        recommender.save_cb_model("models/logit.sav")
-    elif model_type == "nb":
-        recommender = Naive_bayes_recommender(wine_offer_df, cat_data, num_data, True)
-        recommender.save_cb_model("models/nb.sav")
-    else:
-        return make_response(jsonify({"status":"Model unspecified"}), 400)
+    try:    
+        if model_type == "svm":
+            recommender = SVMrecommender(wine_offer_df, cat_data, num_data, True)
+            recommender.save_cb_model("models/svm.sav")
+        elif model_type == "logit":
+            recommender = Logit_recommender(wine_offer_df, cat_data, num_data, True)
+            recommender.save_cb_model("models/logit.sav")
+        elif model_type == "nb":
+            recommender = Naive_bayes_recommender(wine_offer_df, cat_data, num_data, True)
+            recommender.save_cb_model("models/nb.sav")
+        else:
+            return make_response(jsonify({"status":"Model unspecified"}), 400)
+    except exceptions.ImpossibleTrainException:
+        return make_response(jsonify({"status":"Training is not possible"}), 400)
+    except exceptions.IncompatibleData:
+        return make_response(jsonify({"status":"Input offers not on proper format"}), 400)
     
     return make_response(jsonify({"status": "Model updated", "training accuracy": recommender.train_acc, "test accuracy": recommender.test_acc }), 200)
 
