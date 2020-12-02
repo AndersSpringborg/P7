@@ -66,17 +66,17 @@ class wine_db:
                                     purchaseinitials VARCHAR(5))''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS offers
-                                    (offerId VARCHAR(50),
+                                    (offerId VARCHAR(36),
                                     supplierName VARCHAR(30),
-                                    supplierEmail VARCHAR(100),
-                                    linkedWineLwin VARCHAR(50),
+                                    supplierEmail VARCHAR(50),
+                                    linkedWineLwin INTEGER(10),
                                     originalOfferText VARCHAR(100),
-                                    producer VARCHAR(30),
-                                    wineName VARCHAR(100),
+                                    producer VARCHAR(50),
+                                    wineName VARCHAR(50),
                                     quantity INT,
                                     year INT,
                                     price REAL,
-                                    currency VARCHAR(10),
+                                    currency VARCHAR(5),
                                     isOWC BOOL,
                                     isOC BOOL,
                                     isIB BOOL,
@@ -87,7 +87,36 @@ class wine_db:
                                     subRegion VARCHAR(30),
                                     colour VARCHAR(30),
                                     createdAt DATETIME,
-                                    id VARCHAR(50))''')
+                                    id VARCHAR(36))''')
+
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS SVM
+                                    (offers_FK VARCHAR(36),
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(offerId)
+                                    )''')
+
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS NB
+                                    (offers_FK VARCHAR(36),
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(offerId)
+                                    )''')
+
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS LR
+                                    (offers_FK VARCHAR(36),
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(offerId)
+                                    )''')
+
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS price_difference
+                                    (offers_FK VARCHAR(36),
+                                    price_difference REAL(50),
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(offerId)
+                                    )''')
+
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS global_price
+                                    (LWIN_FK VARCHAR(36),
+                                    price REAL(50),
+                                    date DATETIME,
+                                    FOREIGN KEY(LWIN_FK) REFERENCES offers(linkedWineLwin)
+                                    )''')
+
         self.connection.commit()
         self.connection.close()
 
