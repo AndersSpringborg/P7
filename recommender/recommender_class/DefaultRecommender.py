@@ -151,15 +151,6 @@ class DefaultRecommender():
         else:
             return
     
-    # ranks the offers according to global offer price in local df
-    def price_ranking(self, df):
-        if not 'global_price' in self.offer_df:
-            raise exceptions.GlobalWinePriceException(
-                "Global Wine Price Column not defined")
-        df['price_diff'] = df.apply(lambda row: self.get_profit(row), axis=1)
-        self.offer_df = df
-        return df
-
     # calculates the price difference and content-based filtering.
     def recommend(self):
         if not 'global_price' in self.offer_df:
