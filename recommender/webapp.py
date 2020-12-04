@@ -73,7 +73,7 @@ def update_recommendation():
 
     recommender.output()
     
-    return make_response(jsonify({"Results":recommender.recommendation.to_json(orient='records'), "model_type":model_type}), 200)
+    return make_response(jsonify({"Results":recommender.recommendation.to_dict(orient='records'), "model_type":model_type}), 200)
         
 
 if (__name__ == "__main__"):
