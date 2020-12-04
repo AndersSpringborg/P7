@@ -22,7 +22,7 @@ class Logit_recommender(DefaultRecommender):
 
         #create a new column representing the predictions
         self.offer_df = self.offer_df.assign(cb_outcome = regr.predict(x)) 
-        return self.offer_df #self.offer_df.drop(self.offer_df[self.offer_df.cb_outcome == 0].index)
+        return self.offer_df 
 
     #save the parameters of the logistic regression after training with the training data
     def save_cb_model(self, path):

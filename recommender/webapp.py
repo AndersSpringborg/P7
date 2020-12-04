@@ -23,11 +23,11 @@ def default():
 @app.route('/update-model/', methods=["POST"])
 def update():
     model_type = request.form.get('model_type')
-    transaction = request.form.get('Transactions') #TODO:determine whether this is necessary
+    #transaction = request.form.get('Transactions') #TODO:determine whether this is necessary
     wine_offer = request.form.get('WineDeals')
     
     #check for the necessary arguments
-    if model_type == None or transaction == None or wine_offer == None:
+    if model_type == None or wine_offer == None:
         return make_response(jsonify({"status":"Input not on proper format"}), 400)
     
     wine_offer_df = pd.read_json(wine_offer, orient='records')
@@ -75,7 +75,7 @@ def update_recommendation():
 
     recommender.output()
     
-    return make_response(jsonify({"Results":recommender.recommendation.to_json(orient='records')}), 200)
+    return make_response(jsonify({"Results":recommender.recommendation.to_json(orient='records'), "model_type":model_type}), 200)
         
 
 if (__name__ == "__main__"):

@@ -20,8 +20,7 @@ class SVMrecommender(DefaultRecommender):
         
         #create a new column representing the predictions
         self.offer_df = self.offer_df.assign(cb_outcome= clf.predict(x))
-        
-        return self.offer_df.drop(self.offer_df[self.offer_df.cb_outcome == 0].index)
+        return self.offer_df
 
     def save_cb_model(self, path):
         clf = svm.SVC()
