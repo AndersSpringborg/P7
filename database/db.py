@@ -31,7 +31,7 @@ class Offer_Class:
 
 
 class Transaction_Class:
-    def __init__(self, vendorId, postingGroup, number, lwinnumber, description, measurementunit, quantity, directunitcost, amount, variantcode, postingdate, purchaseinitials):
+    def __init__(self, vendorId, postingGroup, number, lwinnumber, description, measurementunit, quantity, directunitcost, amount, variantcode, postingdate, purchaseinitials, offers_FK):
         self.vendorId = vendorId
         self.postingGroup = postingGroup
         self.number = number
@@ -44,6 +44,7 @@ class Transaction_Class:
         self.variantcode = variantcode
         self.postingdate = postingdate
         self.purchaseinitials = purchaseinitials
+        self.offers_FK = offers_FK
 
 
 class wine_db:
@@ -66,15 +67,14 @@ class wine_db:
                                     postingdate DATETIME,
                                     purchaseinitials VARCHAR(5),
                                     offers_FK VARCHAR(36) UNIQUE NOT NULL,
-                                    FOREIGN KEY(offers_FK) REFERENCES offers(offerId)
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS offers
-                                    (offers_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    offerId VARCHAR(36),
+                                    (offerId VARCHAR(36),
                                     supplierName VARCHAR(30),
                                     supplierEmail VARCHAR(50),
-                                    linkedWineLwin INTEGER(10),
+                                    linkedWineLwin VARCHAR(36),
                                     originalOfferText VARCHAR(100),
                                     producer VARCHAR(50),
                                     wineName VARCHAR(50),
@@ -92,34 +92,34 @@ class wine_db:
                                     subRegion VARCHAR(30),
                                     colour VARCHAR(30),
                                     createdAt DATETIME,
-                                    id VARCHAR(36))''')
+                                    id VARCHAR(36) PRIMARY KEY)''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS SVM
                                     (offers_FK VARCHAR(36) UNIQUE NOT NULL,
-                                    FOREIGN KEY(offers_FK) REFERENCES offers(offers_id)
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS NB
                                     (offers_FK VARCHAR(36) UNIQUE NOT NULL,
-                                    FOREIGN KEY(offers_FK) REFERENCES offers(offers_id)
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS LR
                                     (offers_FK VARCHAR(36) UNIQUE NOT NULL,
-                                    FOREIGN KEY(offers_FK) REFERENCES offers(offers_id)
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS price_difference
                                     (offers_FK VARCHAR(36) UNIQUE NOT NULL,
                                     price_difference REAL(50) NOT NULL,
-                                    FOREIGN KEY(offers_FK) REFERENCES offers(offers_id)
+                                    FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
 
         self.connection.execute('''CREATE TABLE IF NOT EXISTS global_price
-                                    (LWIN_FK VARCHAR(36) UNIQUE NOT NULL,
-                                    price REAL(50),
+                                    (LWIN_FK VARCHAR(36),
+                                    global_price REAL(50),
                                     date DATETIME,
-                                    FOREIGN KEY(LWIN_FK) REFERENCES offers(linkedWineLwin)
+                                    PRIMARY KEY(LWIN_FK, date)
                                     )''')
 
         self.connection.commit()
