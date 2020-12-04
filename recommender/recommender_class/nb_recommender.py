@@ -14,7 +14,7 @@ class Naive_bayes_recommender(DefaultRecommender):
         self.check_for_model("models/nb.sav")
         clf = self.load_cb_model("models/nb.sav")
         if not self.isTrainable:
-            x = self.features
+            x = self.feature_to_array()
         else:
             (x,_) = self.to_input_output_arrays()
 
