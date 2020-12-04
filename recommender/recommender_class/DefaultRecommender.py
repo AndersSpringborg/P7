@@ -94,7 +94,6 @@ class DefaultRecommender():
             if not x in all_attr:
                 droplist.append(x)
 
-        # TODO:change from 'outcome' to right name
         if 'transactions_id' in offer_df.columns:
             droplist.append('transactions_id')
             x = offer_df.drop(labels=droplist, axis=1).to_numpy()
@@ -103,7 +102,7 @@ class DefaultRecommender():
             self.train_input = (x, y)
             return (x, y)
         else:
-            raise exceptions.IncompatibleData("'outcome' attribute missing")
+            raise exceptions.IncompatibleData("'transactions_id' attribute missing")
 
     # converts input attributes to feature matrices
     def feature_to_array(self):
@@ -136,17 +135,7 @@ class DefaultRecommender():
         test_y = y[split_size:]
         return train_x, train_y, test_x, test_y
 
-    # ranks the offers according to global offer price in local df
-    def price_ranking(self, df):
-        if not 'global_price' in self.offer_df:
-            raise exceptions.GlobalWinePriceException(
-                "Global Wine Price Column not defined")
-        df['price_diff'] = df.apply(lambda row: self.get_profit(row), axis=1)
-        #df[rank_name] = df['profit'].rank(method="first", ascending=False)
-        #df = df.drop(['profit'], axis=1)
-        #df = df.sort_values('PR', axis=0, ascending=True)
-        self.offer_df = df
-        return df
+    
 
     # calculates the possible profit for a wine offer in the dataframe
     def get_profit(self, row):
@@ -161,21 +150,23 @@ class DefaultRecommender():
             raise exceptions.NoModelException()
         else:
             return
+    
+    # ranks the offers according to global offer price in local df
+    def price_ranking(self, df):
+        if not 'global_price' in self.offer_df:
+            raise exceptions.GlobalWinePriceException(
+                "Global Wine Price Column not defined")
+        df['price_diff'] = df.apply(lambda row: self.get_profit(row), axis=1)
+        self.offer_df = df
+        return df
 
-    # calculates and return the content-based ranking appended to the wine_offer data
-    def cb_ranking(self, df):
-        df1 = self.price_ranking(df)
-        df1 = self.content_based_recommend()
-
-        #df1 = df1[['PR','CBR']]
-        #df = pd.merge(df, df1, how='left', on='PR')
-        return df1
-
-    # calculates the price ranking and content based ranking. Access rankings through offer_df field.
+    # calculates the price difference and content-based filtering.
     def recommend(self):
-        self.offer_df = self.cb_ranking(self.offer_df)
-        #self.offer_df = self.price_ranking(self.offer_df)
-        #self.offer_df = self.cb_ranking(self.offer_df)
+        if not 'global_price' in self.offer_df:
+            raise exceptions.GlobalWinePriceException(
+                "Global Wine Price Column not defined")
+        self.offer_df['price_diff'] = self.offer_df.apply(lambda row: self.get_profit(row), axis=1)
+        self.content_based_recommend()
 
     # organises the recommendation on proper format and saves it into recommendation field.
     def output(self):
@@ -186,29 +177,3 @@ class DefaultRecommender():
                 droplist_columns.append(column)
         self.recommendation = self.offer_df.drop(droplist_columns, axis=1)
 
-
-# random value of 1 or 0 for each wine deals.
-def expected_offer_row(row):
-    i = rand.randint(0, 100)
-    if i >= 50:
-        return 1
-    else:
-        return 0
-
-# a static way of creating dummy global wine price data
-
-
-def static_profit(row):
-    return 100
-
-# dummy data for testing while database has not been created.
-
-
-def get_dummy_data():
-    df = pd.read_json("offers.json", encoding='utf-8')
-    df = df.drop(df[df.wineName == ''].index)
-    df = df.dropna(axis=0, subset=['linkedWineLwin'])
-    df = df.drop_duplicates(subset='linkedWineLwin', keep="first")
-    df['outcome'] = df.apply(lambda row: expected_offer_row(row), axis=1)
-    df['globalPrice'] = df.apply(lambda row: static_profit(row), axis=1)
-    return df

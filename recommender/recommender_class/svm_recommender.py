@@ -1,4 +1,4 @@
-from recommender_class.DefaultRecommender import DefaultRecommender, get_dummy_data
+from recommender_class.DefaultRecommender import DefaultRecommender
 from sklearn import svm, datasets
 from sklearn.metrics import accuracy_score
 import pickle

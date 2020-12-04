@@ -10,7 +10,6 @@ import exceptions
 app = Flask(__name__)
 CORS(app)
 
-#TODO:determine whether supplier name should be included
 #cat_data and num_data are arrays specifying the name of categorical and numerical data in input wine offers, respectively. 
 cat_data = ['region']
 num_data = ['year', 'quantity', 'isOWC', 'isOC', 'isIB', 'price']
@@ -23,7 +22,6 @@ def default():
 @app.route('/update-model/', methods=["POST"])
 def update():
     model_type = request.form.get('model_type')
-    #transaction = request.form.get('Transactions') #TODO:determine whether this is necessary
     wine_offer = request.form.get('WineDeals')
     
     #check for the necessary arguments
