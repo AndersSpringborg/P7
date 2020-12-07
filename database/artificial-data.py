@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+import db
 
 
 def main():
@@ -13,14 +14,19 @@ def main():
     offers_df = load_offers_data()
     offers_df = offers_df.drop(
         offers_df[offers_df.linkedWineLwin.isnull()].index)
-    print(offers_df)
+
     transa_df = load_transactions_data()
-    print(transa_df)
+    transa_df = transa_df.drop(transa_df[transa_df.linkedWineLwin.isnull()].index)
 
-    df = offers_df[~offers_df.linkedWineLwin.isin(transa_df['LWIN No_'])]
+    df_merge = pd.merge(offers_df, transa_df, how="right", on='linkedWineLwin')
+    df_offers = offers_df[offers_df.linkedWineLwin.isin(transa_df.linkedWineLwin)]
+    df_transactions = transa_df[transa_df.linkedWineLwin.isin(offers_df.linkedWineLwin)]
 
-    print(df)
+    df_merge = df_merge.drop_duplicates(subset=['No_', 'Amount'])
 
+    print(df_merge)
+    #print(df_offers)
+    #print(df_transactions)
 
 if __name__ == '__main__':
     main()
