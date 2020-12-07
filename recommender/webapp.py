@@ -6,6 +6,7 @@ from recommender_class.svm_recommender import SVMrecommender
 from recommender_class.logit_recommender import Logit_recommender
 from recommender_class.nb_recommender import Naive_bayes_recommender
 import exceptions
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -21,14 +22,18 @@ def default():
 
 @app.route('/update-model/', methods=["POST"])
 def update():
-    model_type = request.form.get('model_type')
-    wine_offer = request.form.get('WineDeals')
+    data = request.get_json()
+    try:
+        model_type = data['model_type']
+    except TypeError:
+        return make_response(jsonify({"status":"model_type not on proper format"}), 400)
+    try:
+        wine_offer = data['WineDeals']
+    except TypeError:
+        make_response(jsonify({"status":"WineDeals not on proper format"}), 400)
     
-    #check for the necessary arguments
-    if model_type == None or wine_offer == None:
-        return make_response(jsonify({"status":"Input not on proper format"}), 400)
     
-    wine_offer_df = pd.read_json(wine_offer, orient='records')
+    wine_offer_df = pd.read_json(json.dumps(wine_offer), orient='records')
     try:    
         if model_type == "svm":
             recommender = SVMrecommender(wine_offer_df, cat_data, num_data, True)
@@ -50,12 +55,17 @@ def update():
 
 @app.route('/update-recommendation/', methods=["POST"])
 def update_recommendation():
-    wines =  request.form.get('WineDeals')
-    model_type = request.form.get('model_type')
-        
-    if wines == None or model_type == None:
-        make_response(jsonify({"status":"data in body not on proper structure. A json string with wine-offers and a specification of model is needed"}), 400)
-    wines = pd.read_json(wines, orient='records')
+    data = request.get_json()
+    try:
+        wines =  data['WineDeals']
+    except TypeError:
+        make_response(jsonify({"status":"WineDeals not on proper format"}), 400)
+    try:
+        model_type = data['model_type']
+    except TypeError:
+        make_response(jsonify({"status":"model_type not on proper format"}), 400)
+
+    wines = pd.read_json(json.dumps(wines), orient='records')
     try:
         if model_type == 'svm':
             recommender = SVMrecommender(wines, cat_data, num_data, False)
@@ -67,9 +77,9 @@ def update_recommendation():
             recommender = Naive_bayes_recommender(wines, cat_data, num_data, False)
             recommender.recommend()
         else:
-            return make_response(jsonify({"status":"No proper model_type selected. Please choose between 'nb', 'logit' or 'svm'"}), 300)
+            return make_response(jsonify({"status":"No proper model_type selected. Please choose between 'nb', 'logit' or 'svm'"}), 400)
     except exceptions.NoModelException:
-        return make_response(jsonify({"status":"No model for the chosen ML alg has been trained"}), 300)
+        return make_response(jsonify({"status":"No model for the chosen ML alg has been trained"}), 400)
 
     recommender.output()
     
