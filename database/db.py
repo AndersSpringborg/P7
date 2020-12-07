@@ -1,8 +1,7 @@
 import sqlite3
 import pandas as pd
 import json
-import flask as flask
-
+import flask
 
 class Offer_Class:
     def __init__(self, offerId, supplierName, supplierEmail, linkedWineLwin, originalOfferText, producer, wineName, quantity, year, price, currency, isOWC, isOC, isIB, bottlesPerCase, bottleSize, bottleSizeNumerical, region, subRegion, colour, createdAt, wine_id):
@@ -150,7 +149,6 @@ class wine_db:
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
         rows = c.execute('select * from offers').fetchall()
-
         self.connection.close()
 
         return flask.jsonify([dict(ix) for ix in rows])
@@ -297,3 +295,9 @@ class wine_db:
     def create_transaction_obj(self, transaction):
         return Transaction_Class(transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'],
                                  transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'])
+    
+    def create_artificial_offer_obj(self, offer_df_row):
+        return Offer_Class(str(offer_df_row['id']), 'supplierNameArtificial', 'supplier@articial.com', offer_df_row['linkedWineLwin'], offer_df_row['originalOfferText'], offer_df_row['producer'], offer_df_row['wineName'], offer_df_row['quantity'], offer_df_row['year'], offer_df_row['price'], offer_df_row['currency'], offer_df_row['isOWC'], offer_df_row['isOC'], offer_df_row['isIB'], offer_df_row['bottlesPerCase'], offer_df_row['bottleSize'], offer_df_row['bottleSizeNumerical'], offer_df_row['region'], offer_df_row['subRegion'], offer_df_row['colour'], offer_df_row['createdAt'], str(offer_df_row['offer']['id']))
+
+    def create_artificical_trans_obj(self, trans_df_row):
+        return Transaction_Class(trans_df_row['Vendor Id'], trans_df_row['Posting Group'], trans_df_row['No_'], trans_df_row['linkedWineLwin'], str(trans_df_row['Description']), trans_df_row['Unit of Measure'], trans_df_row['Quantity'], trans_df_row['Direct Unit Cost'], trans_df_row['Amount'], trans_df_row['Variant Code'], trans_df_row['Posting Date'], trans_df_row['Purchase Initials'], trans_df_row['id'])
