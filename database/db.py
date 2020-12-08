@@ -472,7 +472,7 @@ class wine_db:
     # Initializer of Transaction_Class given JSON instance.
     def create_transaction_obj(self, transaction):
         return Transaction_Class(transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'],
-                                 transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'], transaction['id'])
+                                 transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'], str(transaction['id']))
     
     def create_artificial_offer_obj(self, offer_df_row):
         return Offer_Class(str(offer_df_row['id']), 'supplierNameArtificial', 'supplier@articial.com', offer_df_row['LWIN No_'], offer_df_row['originalOfferText'], offer_df_row['producer'], offer_df_row['wineName'], offer_df_row['quantity'], offer_df_row['year'], offer_df_row['price'], offer_df_row['currency'], offer_df_row['isOWC'], offer_df_row['isOC'], offer_df_row['isIB'], offer_df_row['bottlesPerCase'], offer_df_row['bottleSize'], offer_df_row['bottleSizeNumerical'], offer_df_row['region'], offer_df_row['subRegion'], offer_df_row['colour'], offer_df_row['createdAt'], str(offer_df_row['offer']['id']))

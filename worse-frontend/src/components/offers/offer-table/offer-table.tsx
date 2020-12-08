@@ -17,7 +17,7 @@ export default function OfferTable() {
   const [searchInput, setSearchInput] = useState<any>(null);
 
   // Endpoint for retrieval of the wine offers from after a given timestamp
-  const getOffersURL = "http://localhost:5000/GetAllOffers";
+  const getOffersURL = "http://localhost:49500/recommendation";
 
   useEffect(() => {
     fetchData();
@@ -25,7 +25,13 @@ export default function OfferTable() {
 
   const fetchData = async () => {
     setLoading(true);
-    const response = await axios.get(getOffersURL);
+    const response = await axios.get(getOffersURL, {
+      headers: {
+        'X-Token': 23984728947
+      }
+    });
+
+    console.log(response);
 
     setOffers(response.data);
     setLoading(false);
