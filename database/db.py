@@ -291,7 +291,6 @@ class wine_db:
         self.connection.close()
         return [dict(ix) for ix in rows]
 
-    # TODO: Test this!
     # Adds wine offer IDs into appropriate recommender relation.
     # Adds price difference.
     def add_recommendations(self, json_result):
