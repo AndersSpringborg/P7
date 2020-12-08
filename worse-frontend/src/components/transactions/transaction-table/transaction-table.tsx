@@ -17,18 +17,23 @@ export default function TransactionTable() {
   const [searchInput, setSearchInput] = useState<any>(null);
 
   // Endpoint for retrieval of the transactions
-  const getTransactionsURL = "http://localhost:5000/GetAllTransactions";
+  const getTransactionsURL = "http://localhost:49500/transactions";
 
   useEffect(() => {
-    fetchData();
+    fetchData().then((response) => {
+      debugger;
+      setTransactions(response.data);
+      setLoading(false);
+    });
   }, []);
 
   const fetchData = async () => {
     setLoading(true);
-    const response = await axios.get(getTransactionsURL);
-
-    setTransactions(response.data);
-    setLoading(false);
+    const response = await axios.get(getTransactionsURL, {
+      headers: {
+        "X-Token": "23984728947",
+      },
+    });
 
     return response.data;
   };
