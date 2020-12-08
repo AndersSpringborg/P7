@@ -12,7 +12,7 @@ export default function OfferTable() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { id }: any = useParams();
-  const apiURL = `http://localhost:5000/GetOfferById/${id || ""}`;
+  const apiURL = `http://localhost:49500/wine/${id || ""}`;
   useEffect(() => {
     fetchData();
   }, []);
