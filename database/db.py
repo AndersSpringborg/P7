@@ -3,7 +3,24 @@ import pandas as pd
 import json
 import flask
 
-class Offer_Class:
+class System_Object:
+    def tostring():
+        return None
+
+class Global_Price(System_Object):
+    def __init__(self, lwin_fk, price, date):
+        self.lwin = lwin_fk
+        self.price = price
+        self.date = date
+
+    @staticmethod
+    def from_json(jstr):
+        return Global_Price(jstr['lwin_fk'], jstr['price'], jstr['date'])
+
+    def tostring(self):
+        return '[' + str(self.lwin) + ', ' + str(self.price) + ', ' + str(self.date) + ']'
+
+class Offer_Class(System_Object):
     def __init__(self, offerId, supplierName, supplierEmail, linkedWineLwin, originalOfferText, producer, wineName, quantity, year, price, currency, isOWC, isOC, isIB, bottlesPerCase, bottleSize, bottleSizeNumerical, region, subRegion, colour, createdAt, wine_id):
         self.offerId = offerId
         self.supplierName = supplierName
@@ -28,8 +45,11 @@ class Offer_Class:
         self.createdAt = createdAt
         self.id = wine_id
 
+    def tostring():
+        return "Not implemented"
 
-class Transaction_Class:
+
+class Transaction_Class(System_Object):
     def __init__(self, vendorId, postingGroup, number, lwinnumber, description, measurementunit, quantity, directunitcost, amount, variantcode, postingdate, purchaseinitials, offers_FK):
         self.vendorId = vendorId
         self.postingGroup = postingGroup
@@ -45,6 +65,8 @@ class Transaction_Class:
         self.purchaseinitials = purchaseinitials
         self.offers_FK = offers_FK
 
+    def tostring():
+        return "Not implemented"
 
 class wine_db:
     def __init__(self, filename="wine.db"):
@@ -93,17 +115,17 @@ class wine_db:
                                     createdAt DATETIME,
                                     id VARCHAR(36) PRIMARY KEY)''')
 
-        self.connection.execute('''CREATE TABLE IF NOT EXISTS SVM
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS svm
                                     (offers_FK VARCHAR(36) UNIQUE NOT NULL,
                                     FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
 
-        self.connection.execute('''CREATE TABLE IF NOT EXISTS NB
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS nb
                                     (offers_FK VARCHAR(36) UNIQUE NOT NULL,
                                     FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
 
-        self.connection.execute('''CREATE TABLE IF NOT EXISTS LR
+        self.connection.execute('''CREATE TABLE IF NOT EXISTS logit
                                     (offers_FK VARCHAR(36) UNIQUE NOT NULL,
                                     FOREIGN KEY(offers_FK) REFERENCES offers(id)
                                     )''')
@@ -128,9 +150,13 @@ class wine_db:
         if (self.connection != None):
             self.connection.close()
 
+    # Open a connection.
+    # Should be used whenever we operate on the database.
     def open_connection(self, filename="wine.db"):
         self.connection = sqlite3.connect(filename)
 
+    # Check offers for being empty.
+    # This is deprecated, since we need to check transactions for being empty as well.
     def empty(self):
         self.open_connection()
         cursor = self.connection.cursor()
@@ -140,6 +166,7 @@ class wine_db:
 
         return row == None
 
+    # All offers left outer joined with global_price on their LWIN (we don't want offers.price to match global_price.price).
     def get_all_offers(self):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -148,11 +175,12 @@ class wine_db:
 
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
-        rows = c.execute('select * from offers').fetchall()
+        rows = c.execute('''SELECT *
+                            FROM offers LEFT OUTER JOIN global_price ON offers.linkedWineLwin=global_price.LWIN_FK''').fetchall()
         self.connection.close()
-
         return flask.jsonify([dict(ix) for ix in rows])
 
+    # Returns all stored transactions.
     def get_all_transactions(self):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -161,12 +189,14 @@ class wine_db:
 
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
-        rows = c.execute('select * from transactions').fetchall()
+        rows = c.execute('SELECT * FROM transactions').fetchall()
 
         self.connection.close()
 
         return flask.jsonify([dict(ix) for ix in rows])
 
+    # Finds all offers in offers created at a latter timestamp than given argument.
+    # Offers are left outer joined with these transactions to make sure every offer is returned.
     def get_offers_from_timestamp(self, timestamp):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -175,13 +205,18 @@ class wine_db:
 
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
-        rows = c.execute(
-            "SELECT * FROM offers WHERE createdAt>=?;", [timestamp]).fetchall()
+        rows = c.execute('''SELECT *
+                            FROM offers LEFT OUTER JOIN (
+                                SELECT transactions_id, offers_FK
+                                FROM transactions
+                            ) AS transactions ON offers.id=transactions.offers_FK
+                            WHERE offers.createdAt>=?''', [timestamp]).fetchall()
 
         self.connection.close()
 
         return flask.jsonify([dict(ix) for ix in rows])
 
+    # Finds speficic offer entity given ID in offers.
     def get_offer_by_id(self, id):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -197,6 +232,111 @@ class wine_db:
 
         return flask.jsonify([dict(ix) for ix in rows])
 
+    # JSON object containing recommendations from each recommender algorithm.
+    def get_recommendation(self):
+        return flask.jsonify({
+            "svm": self.__get_svm_recommendation(),
+            "nb": self.__get_nb_recommendation(),
+            "logit": self.__get_lr_recommendation()
+        })
+
+    # Right outer joins relation SVM with relation offers.
+    # This makes sure every entity in SVM is joined. If an entity in SVM can't be joined, its attributes from offers are None.
+    def __get_svm_recommendation(self):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute('''SELECT *
+                            FROM (offers LEFT OUTER JOIN svm ON svm.offers_FK=offers.id) AS o
+                                        LEFT OUTER JOIN price_difference ON o.id=price_difference.offers_FK''').fetchall()
+
+        self.connection.close()
+        return [dict(ix) for ix in rows]
+
+    # Right outer joins relation NB with relation offers.
+    # This makes sure every entity in NB is joined. If an entity in NB can't be joined, its attributes from offers are None.
+    def __get_nb_recommendation(self):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute('''SELECT *
+                            FROM (offers LEFT OUTER JOIN nb ON nb.offers_FK=offers.id) AS o
+                                        LEFT OUTER JOIN price_difference ON o.id=price_difference.offers_FK''').fetchall()
+
+        self.connection.close()
+        return [dict(ix) for ix in rows]
+
+    # Right outer joins relation LR with relation offers.
+    # This makes sure every entity in LR is joined. If an entity in LR can't be joined, its attributes from offers are None.
+    def __get_lr_recommendation(self):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute('''SELECT *
+                            FROM (offers LEFT OUTER JOIN logit ON logit.offers_FK=offers.id) AS o
+                                        LEFT OUTER JOIN price_difference ON o.id=price_difference.offers_FK''').fetchall()
+
+        self.connection.close()
+        return [dict(ix) for ix in rows]
+
+    # TODO: Test this!
+    # Adds wine offer IDs into appropriate recommender relation.
+    # Adds price difference.
+    def add_recommendations(self, json_result):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        for result in json_result['Results']:
+            print("Inserting recommendation for wine " + str(result['id']))
+            cursor = self.connection.cursor()
+
+            if (int(result['cb_outcome']) > 0):
+                cursor.execute('INSERT OR IGNORE INTO ' + json_result['model_type'] + '''(
+                                offers_FK)
+                                VALUES(?)''', [str(result['id'])])
+
+            cursor.execute('''INSERT OR IGNORE INTO price_difference(
+                                offers_FK,
+                                price_difference)
+                                VALUES(?,?)''', (str(result['id']), result['price_diff']))
+
+        self.connection.commit()
+        self.connection.close()
+
+    # Adds global prices into its relation.
+    def add_global_prices(self, prices):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        for price in prices:
+            print("Inserting global price: " + price.tostring())
+            cursor = self.connection.cursor()
+            cursor.execute('''INSERT OR IGNORE INTO global_price(
+                                            LWIN_FK,
+                                            global_price,
+                                            date)
+                                            VALUES(?,?,?)''', (price.lwin, price.price, price.date))
+
+        self.connection.commit()
+        self.connection.close()
+
+    # Adds wine offers into its relation.
     def add_wineoffers(self, sql_wineoffers):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -231,10 +371,11 @@ class wine_db:
                                               createdAt,
                                               id)
                                               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (wine.offerId, wine.supplierName, wine.supplierEmail, wine.linkedWineLwin, wine.originalOfferText, wine.producer, wine.wineName, wine.quantity, wine.year, wine.price, wine.currency, wine.isOWC, wine.isOC, wine.isIB, wine.bottlesPerCase, wine.bottleSize, wine.bottleSizeNumerical, wine.region, wine.subRegion, wine.colour, wine.createdAt, wine.id))
-            self.connection.commit()
-
+            
+        self.connection.commit()
         self.connection.close()
 
+    # Add transactions into its relation.
     def add_transactions_data(self, transactions):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -258,11 +399,12 @@ class wine_db:
                                               amount,
                                               variantcode,
                                               postingdate,
-                                              purchaseinitials
+                                              purchaseinitials,
+                                              offers_FK
                                               )
-                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction.vendorId, transaction.postingGroup, transaction.number, transaction.lwinnumber, transaction.description, transaction.measurementunit, transaction.quantity, transaction.directunitcost, transaction.amount, transaction.variantcode, transaction.postingdate, transaction.purchaseinitials))
-            self.connection.commit()
-
+                                              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction.vendorId, transaction.postingGroup, transaction.number, transaction.lwinnumber, transaction.description, transaction.measurementunit, transaction.quantity, transaction.directunitcost, transaction.amount, transaction.variantcode, transaction.postingdate, transaction.purchaseinitials, transaction.offers_FK))
+        
+        self.connection.commit()
         self.connection.close()
 
     def clean_offers_data(self, offer):
@@ -289,9 +431,11 @@ class wine_db:
         returnTransaction = transaction
         return returnTransaction
 
+    # Initializer of Offer_class given JSON instance.
     def create_offer_obj(self, offer):
         return Offer_Class(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
 
+    # Initializer of Transaction_Class given JSON instance.
     def create_transaction_obj(self, transaction):
         return Transaction_Class(transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'],
                                  transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'], transaction['id'])

@@ -2,6 +2,7 @@ from flask import Flask, redirect, abort, request, jsonify, make_response
 from flask_cors import CORS
 import requests
 import json
+import io
 
 app = Flask(__name__)
 CORS(app)
@@ -37,7 +38,7 @@ def db_get():
     while compare_swap(False, True):
         pass
 
-    response = requests.get(DB_DOMAIN + '/GetOffers')
+    response = requests.get(DB_DOMAIN + '/GetRecommendation')
     
     if (int(response.status_code) >= 400):
         mtx = False
@@ -62,7 +63,27 @@ def get_wine(arg):
 
     mtx = False
     return response.content
-        
+
+# Handles POST request from 3rd party to add global wine prices.
+# Appends new global wine prices to db.
+@app.route('/global_prices', methods = ['POST'])
+def global_prices_post():
+    global mtx
+
+    if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
+        return make_response('Request not from developer component', 401)
+
+    while compare_swap(False, True):
+        pass
+
+    response = requests.post(DB_DOMAIN + '/AddGlobalPrices', json = request.get_json())
+
+    if (int(response.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', response.status_code)
+
+    mtx = False
+    return ""
 
 # Handles POST request from 3rd party to add transaction data.
 # Appends new transaction data to transactions relation in db.
@@ -76,7 +97,7 @@ def transactions_post():
     while compare_swap(False, True):
         pass
 
-    response = requests.post(DB_DOMAIN + '/AddTransactions', data = io.StringIO(request.data.decode('UTF-8')))
+    response = requests.post(DB_DOMAIN + '/AddTransactions', data = request.data)
 
     if (int(response.status_code) >= 400):
         mtx = False
@@ -97,13 +118,18 @@ def wine_deals_post():
     while compare_swap(False, True):
         pass
 
-    db_response = requests.post(DB_DOMAIN + '/AddOffers', json = request.get_json())
+    json_in = request.get_json()
+    db_response = requests.post(DB_DOMAIN + '/AddOffers', json = json_in['WineDeals'])
 
     if (int(db_response.status_code) >= 400):
         mtx = False
         make_response('Database component error', db_response.status_code)
 
-    rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', json = json.loads(db_response.text))
+    merged = {
+        "WineDeals": json.loads(db_response.text),
+        "model_type": json_in['model_type']
+    }
+    rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', json = merged)
 
     if (int(rec_result.status_code) >= 400):
         mtx = False
@@ -140,8 +166,12 @@ def interval_post():
         mtx = False
         return make_response('Database component error', get_response.status_code)
 
-    post_response = requests.post(RECOMMENDER_DOMAIN + '/update-model', json = json.loads(get_response.text))
-
+    merged = {
+        "WineDeals": json.loads(get_response.text),
+        "model_type": json_data['TimeInterval']['model_type']
+    }
+    post_response = requests.post(RECOMMENDER_DOMAIN + '/update-model', json = merged)
+    
     if (int(post_response.status_code) >= 400):
         mtx = False
         make_response('Recommender component error', post_response.status_code)
