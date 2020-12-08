@@ -3,13 +3,16 @@ from flask_cors import CORS
 import requests
 import json
 import io
+import sys
 
 app = Flask(__name__)
 CORS(app)
 mtx = False
 
-DB_DOMAIN = 'http://worse-db:49502'
-RECOMMENDER_DOMAIN = 'http://worse-recommender:49501'
+DB_PORT = 49502
+RECOMMENDER_PORT = 49501
+DB_DOMAIN = 'http://worse-db:' + str(DB_PORT)
+RECOMMENDER_DOMAIN = 'http://worse-recommender:' + str(RECOMMENDER_PORT)
 
 # Dictionary of tokens for each component.
 tokens = {
@@ -197,4 +200,8 @@ def compare_swap(expected, new):
     return actual
 
 if __name__ == "__main__":
+    if (len(sys.argv) >= 2 and sys.argv[1] == 'local'):
+        DB_DOMAIN = 'http://127.0.0.1:' + str(DB_PORT)
+        RECOMMENDER_DOMAIN = 'http://127.0.0.1:' + str(RECOMMENDER_PORT)
+
     app.run(host = '0.0.0.0', port = 49500)

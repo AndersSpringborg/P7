@@ -291,7 +291,25 @@ class wine_db:
         self.connection.close()
         return [dict(ix) for ix in rows]
 
-    # TODO: Test this!
+    ## Returns globsal price difference of wine.
+    def global_price_difference(self, id):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        price_difference = c.execute('''SELECT price_difference.price_difference
+                                        FROM offers JOIN price_difference ON offers.id=price_difference.offers_FK
+                                        WHERE id=?''', [id]).fetchone()
+        self.connection.close()
+
+        if price_difference == None:
+            return None
+
+        return price_difference[0]
+
     # Adds wine offer IDs into appropriate recommender relation.
     # Adds price difference.
     def add_recommendations(self, json_result):
