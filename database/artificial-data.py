@@ -14,15 +14,16 @@ def main():
         return pd.read_csv('test_trans.csv')
 
     offers_df = load_offers_data()
+    offers_df.rename(columns={'linkedWineLwin': 'LWIN No_'}, inplace=True)
+
     offers_df = offers_df.drop(
-        offers_df[offers_df.linkedWineLwin.isnull()].index)
+        offers_df[offers_df['LWIN No_'].isnull()].index)
 
     transa_df = load_transactions_data()
-    transa_df.rename(columns={'LWIN No_': 'linkedWineLwin'}, inplace=True)
-    transa_df = transa_df.drop(transa_df[transa_df.linkedWineLwin.isnull()].index)
+    transa_df = transa_df.drop(transa_df[transa_df['LWIN No_'].isnull()].index)
     
 
-    trans_offer_df = pd.merge(offers_df, transa_df, how="left", on='linkedWineLwin')
+    trans_offer_df = pd.merge(offers_df, transa_df, how="left", on='LWIN No_')
     trans_offer_df = trans_offer_df.drop_duplicates(subset=['No_', 'Amount'])
 
     artificial_offers = []
@@ -33,7 +34,7 @@ def main():
         row['offer']['id'] = uuid.uuid4()
 
         artificial_offers.append(db.create_artificial_offer_obj(row))
-        artificial_trans.append(db.create_artificical_trans_obj(row))
+        artificial_trans.append(db.create_transaction_obj(row))
 
     db.add_wineoffers(artificial_offers)
     db.add_transactions_data(artificial_trans)
