@@ -232,6 +232,22 @@ class wine_db:
 
         return flask.jsonify([dict(ix) for ix in rows])
 
+
+    def get_transaction_by_id(self, id):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute(
+            "SELECT * FROM transactions WHERE transactions_id=?;", [id]).fetchall()
+
+        self.connection.close()
+
+        return flask.jsonify([dict(ix) for ix in rows])
+
     # JSON object containing recommendations from each recommender algorithm.
     def get_recommendation(self):
         return flask.jsonify({

@@ -129,5 +129,9 @@ def get_offer_by_id(arg):
 def get_all_transactions():
     return wine_db.get_all_transactions()
 
+@ app.route('/GetTransactionById/<arg>', methods=['GET'])
+def get_transaction_by_id(arg):
+    return wine_db.get_transaction_by_id(arg)
+
 if (__name__ == "__main__"):
     app.run(host = '0.0.0.0', port = 49502)

@@ -50,6 +50,25 @@ def db_get():
     mtx = False
     return response.content
 
+@app.route('/transactions', methods = ['GET'])
+def db_get_transactions():
+    global mtx
+
+    if (not 'X-Token' in request.headers) or int(request.headers['X-Token']) != tokens['UI']:
+        return make_response('Request not from UI component', 401)
+
+    while compare_swap(False, True):
+        pass
+
+    response = requests.get(DB_DOMAIN + '/GetTransactions')
+    
+    if (int(response.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', response.status_code)
+
+    mtx = False
+    return response.content
+
 # Gets single wine by given wine ID.
 @app.route('/wine/<arg>', methods = ['GET'])
 def get_wine(arg):
@@ -59,6 +78,23 @@ def get_wine(arg):
         pass
 
     response = requests.get(DB_DOMAIN + '/GetOfferById/' + str(arg))
+
+    if (int(response.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', response.status_code)
+
+    mtx = False
+    return response.content
+
+# Gets single transaction by given ID.
+@app.route('/transaction/<arg>', methods = ['GET'])
+def get_transaction(arg):
+    global mtx
+    
+    while compare_swap(False, True):
+        pass
+
+    response = requests.get(DB_DOMAIN + '/GetTransactionById/' + str(arg))
 
     if (int(response.status_code) >= 400):
         mtx = False
