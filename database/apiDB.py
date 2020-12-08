@@ -75,7 +75,7 @@ def recommendation_post():
             "id": wine['id'],
             "LWIN_FK": wine['LWIN_FK'],
             "global_price": wine['global_price'],
-            "price_difference": None,
+            "price_difference": wine_db.global_price_difference(wine['id']),
             "svm": is_recommended_by(recommendations, "svm", wine['id']),
             "nb": is_recommended_by(recommendations, "nb", wine['id']),
             "logit": is_recommended_by(recommendations, "logit", wine['id'])
