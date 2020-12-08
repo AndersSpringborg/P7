@@ -44,7 +44,56 @@ def new_recommendation_post():
 
 @app.route('/GetRecommendation', methods = ['GET'])
 def recommendation_post():
-    return wine_db.get_recommendation()
+    offers_global_prices = wine_db.get_all_offers().get_json()
+    recommendations = wine_db.get_recommendation().get_json()
+    compressed = list()
+
+    # This is really cumbersome.
+    for wine in offers_global_prices:
+        compressed.append({
+            "offerId": wine['offerId'],
+            "supplierName": wine['supplierName'],
+            "supplierEmail": wine['supplierEmail'],
+            "linkedWineLwin": wine['linkedWineLwin'],
+            "originalOfferText": wine['originalOfferText'],
+            "producer": wine['producer'],
+            "wineName": wine['wineName'],
+            "quantity": wine['quantity'],
+            "year": wine['year'],
+            "price": wine['price'],
+            "currency": wine['currency'],
+            "isOWC": wine['isOWC'],
+            "isOC": wine['isOC'],
+            "isIB": wine['isIB'],
+            "bottlesPerCase": wine['bottlesPerCase'],
+            "bottleSize": wine['bottleSize'],
+            "bottleSizeNumerical": wine['bottleSizeNumerical'],
+            "region": wine['region'],
+            "subRegion": wine['subRegion'],
+            "colour": wine['colour'],
+            "createdAt": wine['createdAt'],
+            "id": wine['id'],
+            "LWIN_FK": wine['LWIN_FK'],
+            "global_price": wine['global_price'],
+            "price_difference": None,
+            "svm": is_recommended_by(recommendations, "svm", wine['id']),
+            "nb": is_recommended_by(recommendations, "nb", wine['id']),
+            "logit": is_recommended_by(recommendations, "logit", wine['id'])
+        })
+
+    return flask.jsonify(compressed)
+
+def is_recommended_by(recommendation_json, recommender_alg, id):
+    wines = recommendation_json[recommender_alg]
+
+    for wine in wines:
+        if (wine['id'] == id and wine['offers_FK'] != None):
+            return True
+
+        elif (wine['id'] == id):
+            return False
+
+    return False
 
 @app.route('/AddTransactions', methods=['POST'])
 def transactions_post():
