@@ -155,7 +155,7 @@ offers = {"WineDeals":[
 "model_type":"svm"
 }
 
-transactions = '''Vendor Id,Posting Group,No_,LWIN No_,Description,Unit of Measure,Quantity,Direct Unit Cost,Amount,Variant Code,Posting Date,Purchase Initials,offers ID
+transactions = '''Vendor Id,Posting Group,No_,LWIN No_,Description,Unit of Measure,Quantity,Direct Unit Cost,Amount,Variant Code,Posting Date,Purchase Initials,id
 701,VIN,107979,1082555,Some vendor 1,750ml,1,3700,3700,1,2019-01-02 00.00.00.000,XX,786234129
 701,VIN,107979,1082555,Some vendor 2,750ml,15,3700,55500,2,2019-01-02 00.00.00.000,XX,48927940
 575,SPIRITUS,106465,1398548,Some other vendor,750ml,1,48820,48820,3,2019-01-07 00.00.00.000,YY,6583'''
