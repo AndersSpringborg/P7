@@ -18,6 +18,10 @@ def main():
 
     offers_df = offers_df.drop(
         offers_df[offers_df['LWIN No_'].isnull()].index)
+    offers_df = offers_df.drop(
+        offers_df[offers_df['wineName'].isnull()].index)
+    offers_df = offers_df.drop(
+        offers_df[offers_df['region'].isnull()].index)
 
     transa_df = load_transactions_data()
     transa_df = transa_df.drop(transa_df[transa_df['LWIN No_'].isnull()].index)
