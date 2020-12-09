@@ -11,7 +11,7 @@ export default function OfferTable() {
   const [offers, setOffers] = useState<WineOffer[]>([]);
   const [data, setData] = useState<WineOffer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [chosenDropdownItem, setChosenDropdownItem] = useState<number>(0);
+  const [chosenDropdownItem, setChosenDropdownItem] = useState<number>(3);
   const [searchState, setSearchState] = useState<{
     searchText: any;
     searchedColumn: any;

@@ -19,7 +19,7 @@ def main():
     offers_df = offers_df.drop(
         offers_df[offers_df['LWIN No_'].isnull()].index)
     offers_df = offers_df.drop(
-        offers_df[offers_df['wineName'].isnull()].index)
+        offers_df[offers_df['wineName'] == ""].index)
     offers_df = offers_df.drop(
         offers_df[offers_df['region'].isnull()].index)
 
@@ -35,7 +35,6 @@ def main():
 
     for index, row in trans_offer_df.iterrows():
         row['id'] = uuid.uuid4()
-        row['offer']['id'] = uuid.uuid4()
 
         artificial_offers.append(db.create_artificial_offer_obj(row))
         artificial_trans.append(db.create_transaction_obj(row))

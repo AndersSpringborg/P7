@@ -22,7 +22,7 @@ def offers_post():
 
     wine_db.add_wineoffers(offers)
 
-    return wine_db.get_all_offers()
+    return flask.jsonify(wine_db.get_global_price_for_offers(offers))
 
 # Reads JSON array of global prices into list of Global_Price objects.
 # They are then inserted.

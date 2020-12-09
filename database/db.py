@@ -48,6 +48,11 @@ class Offer_Class(System_Object):
     def tostring():
         return "Not implemented"
 
+def offer_class_to_dict(offers):
+    offer_arr = []
+    for offer in offers:
+        offer_arr.extend(offer.__dict__)
+    return offer_arr
 
 class Transaction_Class(System_Object):
     def __init__(self, vendorId, postingGroup, number, lwinnumber, description, measurementunit, quantity, directunitcost, amount, variantcode, postingdate, purchaseinitials, offers_FK):
@@ -495,4 +500,21 @@ class wine_db:
                                  transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'], str(transaction['id']))
     
     def create_artificial_offer_obj(self, offer_df_row):
-        return Offer_Class(str(offer_df_row['id']), 'supplierNameArtificial', 'supplier@articial.com', offer_df_row['LWIN No_'], offer_df_row['originalOfferText'], offer_df_row['producer'], offer_df_row['wineName'], offer_df_row['quantity'], offer_df_row['year'], offer_df_row['price'], offer_df_row['currency'], offer_df_row['isOWC'], offer_df_row['isOC'], offer_df_row['isIB'], offer_df_row['bottlesPerCase'], offer_df_row['bottleSize'], offer_df_row['bottleSizeNumerical'], offer_df_row['region'], offer_df_row['subRegion'], offer_df_row['colour'], offer_df_row['createdAt'], str(offer_df_row['offer']['id']))
+        return Offer_Class(str(offer_df_row['offer']['id']), 'supplierNameArtificial', 'supplier@articial.com', offer_df_row['LWIN No_'], offer_df_row['originalOfferText'], offer_df_row['producer'], offer_df_row['wineName'], offer_df_row['quantity'], offer_df_row['year'], offer_df_row['price'], offer_df_row['currency'], offer_df_row['isOWC'], offer_df_row['isOC'], offer_df_row['isIB'], offer_df_row['bottlesPerCase'], offer_df_row['bottleSize'], offer_df_row['bottleSizeNumerical'], offer_df_row['region'], offer_df_row['subRegion'], offer_df_row['colour'], offer_df_row['createdAt'], str(offer_df_row['id']))
+    
+    def get_global_price_for_offers(self, offers):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+        for offer in offers:
+            cursor = self.connection.cursor()
+            sql_row = cursor.execute("SELECT global_price FROM global_price WHERE LWIN_FK = " + str(offer.linkedWineLwin))
+            print('printing:...')
+            print(sql_row)
+            offer.global_price = 10
+        self.connection.commit()
+        self.connection.close()
+        print(offer_class_to_dict(offers))
+        return offer_class_to_dict( offers)
+
