@@ -5,14 +5,14 @@ import { Row, Col, Divider, Spin } from "antd";
 import { LeftCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
-import "./offer-info.scss";
+import "./transaction-info.scss";
 
-export default function WineInfo() {
-  const [wines, setWines] = useState<WineOffer[]>([]);
+export default function TransactionInfo() {
+  const [transaction, setTransaction] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { id }: any = useParams();
-  const apiURL = `http://localhost:49500/wine/${id || ""}`;
+  const apiURL = `http://localhost:49500/transaction/${id || ""}`;
   useEffect(() => {
     fetchData();
   }, []);
@@ -21,7 +21,7 @@ export default function WineInfo() {
     setLoading(true);
     const response = await axios.get(apiURL);
 
-    setWines(response.data);
+    setTransaction(response.data);
     setLoading(false);
     return response.data;
   };
@@ -41,7 +41,7 @@ export default function WineInfo() {
         <>
           <div className="headerText">
             {" "}
-            {wines[0]?.wineName} {wines[0]?.year}{" "}
+            {transaction[0]?.description}{" "}
           </div>
           <div
             //sstyle={{ padding: 24, minHeight: 360 }}
@@ -49,116 +49,77 @@ export default function WineInfo() {
             <Row style={{ justifyContent: "center" }}>
               <Row justify="center" className="infoBox">
                 <Col style={{ width: "40vh" }}>
-                  <h1 className="header2Text">Offer & Supplier</h1>
+                  <h1 className="header2Text">Information</h1>
                   <Col>
                     <Row>
                       <span className="text">
-                        Price: {wines[0]?.price} {wines[0]?.currency}
+                        VendorId: {transaction[0]?.vendorId}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Quantity: {wines[0]?.quantity}
+                        PostingGroup: {transaction[0]?.postingGroup}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Name: {wines[0]?.supplierName}
+                        Number: {transaction[0]?.number}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Email: {wines[0]?.supplierEmail}
+                        LWIN: {transaction[0]?.lwinNumber}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Original offer text: {wines[0]?.originalOfferText}
+                        Description: {transaction[0]?.description}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Created at: {wines[0]?.createdAt}
-                      </span>
-                    </Row>
-                  </Col>
-                </Col>
-              </Row>
-              <div style={{ width: "110px" }}/>
-              <Row justify="center" className="infoBox">
-                <Col style={{ width: "40vh" }}>
-                  <h1 className="header2Text">Wine</h1>
-                  <Col>
-                    <Row>
-                      <span className="text">
-                        Wine name: {wines[0]?.wineName}
+                        Measurement Unit: {transaction[0]?.measurementunit}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Producer: {wines[0]?.producer}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">Region: {wines[0]?.region}</span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Sub Region: {wines[0]?.subRegion}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">Year: {wines[0]?.year}</span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">Colour: {wines[0]?.colour}</span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        LWIN: {wines[0]?.linkedWineLwin}
-                      </span>
-                    </Row>
-                  </Col>
-                </Col>
-              </Row>
-              <div style={{ width: "110px" }}></div>
-              <Row justify="center" className="infoBox">
-                <Col style={{ width: "40vh" }}>
-                  <h1 className="header2Text">Packaging</h1>
-                  <Col>
-                    <Row>
-                      <span className="text">
-                        Package Feaures: {wines[0]?.isOWC} {wines[0]?.isOC}{" "}
-                        {wines[0]?.isIB}
+                        Quantity: {transaction[0]?.quantity}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Bottles per case: {wines[0]?.bottlesPerCase}
+                        Direct Unit Cost: {transaction[0]?.directunitcost}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Bottle size: {wines[0]?.bottleSize}
+                        Amount: {transaction[0]?.amount}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
                       <span className="text">
-                        Bottle size (numerical): {wines[0]?.bottleSizeNumerical}
+                        Variant Code: {transaction[0]?.variantcode}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Posting Date: {transaction[0]?.postingdate}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Offer ID: {transaction[0]?.offers_FK}
                       </span>
                     </Row>
                   </Col>

@@ -17,7 +17,7 @@ export default function TransactionTable() {
   const [searchInput, setSearchInput] = useState<any>(null);
 
   // Endpoint for retrieval of the transactions
-  const getTransactionsURL = "http://localhost:5000/GetAllTransactions";
+  const TransactionsURL = "http://localhost:49500/transactions";
 
   useEffect(() => {
     fetchData();
@@ -25,7 +25,13 @@ export default function TransactionTable() {
 
   const fetchData = async () => {
     setLoading(true);
-    const response = await axios.get(getTransactionsURL);
+    const response = await axios.get(TransactionsURL, {
+      headers: {
+        'X-Token': 23984728947
+      }
+    });
+
+    console.log(response);
 
     setTransactions(response.data);
     setLoading(false);
@@ -37,8 +43,7 @@ export default function TransactionTable() {
 
   // Handles the routing for accessing a particular transaction page
   function handleRowClick(id: string) {
-    // TODO: Change the routing when transaction-info page has been implemented
-    history.push(`/wineOffer/${id}`);
+    history.push(`/transactions/${id}`);
   }
 
   // Creates the search functionality on the different columns in the transaction table
@@ -173,8 +178,7 @@ export default function TransactionTable() {
             onRow={(record, rowIndex) => {
               return {
                 onClick: (event) => {
-                  console.log(record);
-                  return handleRowClick(record.vendorId);
+                  return handleRowClick(record.transactions_id);
                 },
               };
             }}

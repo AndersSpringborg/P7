@@ -8,7 +8,8 @@ import { Content } from "antd/lib/layout/layout";
 import "./offer-table.scss";
 
 export default function OfferTable() {
-  const [offers, setOffers] = useState<any[]>([]);
+  const [offers, setOffers] = useState<WineOffer[]>([]);
+  const [data, setData] = useState<WineOffer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [chosenDropdownItem, setChosenDropdownItem] = useState<number>(0);
   const [searchState, setSearchState] = useState<{
@@ -24,6 +25,18 @@ export default function OfferTable() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if(chosenDropdownItem === 0) {
+      setData(offers.filter(x => x.svm_key != null));
+    } else if (chosenDropdownItem === 1) {
+      setData(offers.filter(x => x.nb_key != null));
+    } else if (chosenDropdownItem === 2) {
+      setData(offers.filter(x => x.logit_key != null));
+    } else {
+      setData(offers);
+    }
+  }, [chosenDropdownItem, offers]);
+
   const fetchData = async () => {
     setLoading(true);
     const response = await axios.get(getOffersURL, {
@@ -31,8 +44,6 @@ export default function OfferTable() {
         'X-Token': 23984728947
       }
     });
-
-    console.log(response);
 
     setOffers(response.data);
     setLoading(false);
@@ -218,7 +229,7 @@ export default function OfferTable() {
         ) : (
           <Table
             columns={offerTableColumns}
-            dataSource={offers}
+            dataSource={data}
             onRow={(record, rowIndex) => {
               return {
                 onClick: (event) => {

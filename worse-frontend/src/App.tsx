@@ -6,6 +6,7 @@ import WorstLayout from "./components/worst-layout";
 import OfferTable from "./components/offers/offer-table/offer-table";
 import WineInfo from "./components/offers/offer-info/offer-info";
 import TransactionTable from "./components/transactions/transaction-table/transaction-table";
+import TransactionInfo from "./components/transactions/transaction-info/transaction-info";
 
 function App() {
   return (
@@ -24,6 +25,11 @@ function App() {
         <Route exact path="/transactions">
           <WorstLayout>
             <TransactionTable />
+          </WorstLayout>
+        </Route>
+        <Route exact path="/transactions/:id">
+          <WorstLayout>
+            <TransactionInfo />
           </WorstLayout>
         </Route>
       </Switch>
