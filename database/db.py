@@ -256,22 +256,25 @@ class wine_db:
             "logit": self.__get_lr_recommendation()
         })
 
+    # Faster way of retreiving recommendation data.
     def get_recommendation_fast(self):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
         self.open_connection()
+
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
         rows = c.execute('''SELECT *
-                            FROM ((offers LEFT OUTER JOIN (SELECT offers_FK AS svm_key
+                            FROM (((offers LEFT OUTER JOIN (SELECT offers_FK AS svm_key
                                                             FROM svm) AS svm ON offers.id=svm.svm_key) AS offers_svm
                                         LEFT OUTER JOIN (SELECT offers_FK AS nb_key
                                                             FROM nb) as nb ON offers_svm.id=nb.nb_key) AS offers_svm_nb
                                         LEFT OUTER JOIN (SELECT offers_FK AS logit_key
-                                                            FROM logit) as logit ON offers_svm_nb.id=logit.logit_key''')
+                                                            FROM logit) as logit ON offers_svm_nb.id=logit.logit_key) AS offers_svm_nb_logit
+                                        LEFT OUTER JOIN price_difference ON offers_svm_nb_logit.id=price_difference.offers_FK''').fetchall()
         self.connection.close()
-        return [dict(ix) for ix in rows]
+        return flask.jsonify([dict(ix) for ix in rows])
 
     # Right outer joins relation SVM with relation offers.
     # This makes sure every entity in SVM is joined. If an entity in SVM can't be joined, its attributes from offers are None.
