@@ -8,6 +8,7 @@ import sys
 app = Flask(__name__)
 CORS(app)
 mtx = False
+lock = True
 
 DB_PORT = 49502
 RECOMMENDER_PORT = 49501
@@ -39,8 +40,9 @@ def db_get():
     if (not 'X-Token' in request.headers) or int(request.headers['X-Token']) != tokens['UI']:
         return make_response('Request not from UI component', 401)
 
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     response = requests.get(DB_DOMAIN + '/GetRecommendation')
     
@@ -59,8 +61,9 @@ def db_get_transactions():
     if (not 'X-Token' in request.headers) or int(request.headers['X-Token']) != tokens['UI']:
         return make_response('Request not from UI component', 401)
 
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     response = requests.get(DB_DOMAIN + '/GetTransactions')
     
@@ -76,8 +79,9 @@ def db_get_transactions():
 def get_wine(arg):
     global mtx
     
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     response = requests.get(DB_DOMAIN + '/GetOfferById/' + str(arg))
 
@@ -93,8 +97,9 @@ def get_wine(arg):
 def get_transaction(arg):
     global mtx
     
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     response = requests.get(DB_DOMAIN + '/GetTransactionById/' + str(arg))
 
@@ -114,8 +119,9 @@ def global_prices_post():
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
         return make_response('Request not from developer component', 401)
 
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     response = requests.post(DB_DOMAIN + '/AddGlobalPrices', json = request.get_json())
 
@@ -135,8 +141,9 @@ def transactions_post():
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
         return make_response('Request not from developer component', 401)
 
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     response = requests.post(DB_DOMAIN + '/AddTransactions', data = request.data)
 
@@ -156,8 +163,9 @@ def wine_deals_post():
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
         return make_response('Request not from developer component', 401)
 
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     json_in = request.get_json()
     db_response = requests.post(DB_DOMAIN + '/AddOffers', json = json_in['WineDeals'])
@@ -198,8 +206,9 @@ def interval_post():
     elif not parse_time_interval(json_data):
         return make_response('Data couldn\'t be parsed', 400)
 
-    while compare_swap(False, True):
-        pass
+    if (lock):
+        while compare_swap(False, True):
+            pass
 
     get_response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(json_data['TimeInterval']['Time']), headers = {'model-type': json_data['TimeInterval']['model_type']})
     
@@ -238,8 +247,12 @@ def compare_swap(expected, new):
     return actual
 
 if __name__ == "__main__":
-    if (len(sys.argv) >= 2 and sys.argv[1] == 'local'):
-        DB_DOMAIN = 'http://127.0.0.1:' + str(DB_PORT)
-        RECOMMENDER_DOMAIN = 'http://127.0.0.1:' + str(RECOMMENDER_PORT)
+    if (len(sys.argv) >= 2):
+        if (sys.argv[1] == 'local' or (len(sys.argv) >= 3 and sys.argv[2] == 'local')):
+            DB_DOMAIN = 'http://127.0.0.1:' + str(DB_PORT)
+            RECOMMENDER_DOMAIN = 'http://127.0.0.1:' + str(RECOMMENDER_PORT)
+
+        elif (sys.argv[1] == 'nolock' or (len(sys.argv) >= 3 and sys.argv[2] == 'nolock')):
+            lock = False
 
     app.run(host = '0.0.0.0', port = 49500)
