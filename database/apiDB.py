@@ -10,11 +10,12 @@ app = flask.Flask(__name__)
 CORS(app)
 wine_db = db.wine_db()
 
+
 @app.route('/AddOffers', methods=['POST'])
 def offers_post():
     offers = []
     offers_data = request.get_json()
-    
+
     for offer in offers_data:
         current_offer = wine_db.clean_offers_data(offer)
         if current_offer is not None:
@@ -22,11 +23,13 @@ def offers_post():
 
     wine_db.add_wineoffers(offers)
 
-    return flask.jsonify(wine_db.get_global_price_for_offers(offers))
+    return wine_db.get_global_price_for_offers(offers)
 
 # Reads JSON array of global prices into list of Global_Price objects.
 # They are then inserted.
-@app.route('/AddGlobalPrices', methods = ['POST'])
+
+
+@app.route('/AddGlobalPrices', methods=['POST'])
 def global_prices_post():
     prices = []
     json_prices = request.get_json()
@@ -37,14 +40,17 @@ def global_prices_post():
     wine_db.add_global_prices(prices)
     return ""
 
-@app.route('/NewRecommendation', methods = ['POST'])
+
+@app.route('/NewRecommendation', methods=['POST'])
 def new_recommendation_post():
     wine_db.add_recommendations(request.get_json())
     return ""
 
-@app.route('/GetRecommendation', methods = ['GET'])
+
+@app.route('/GetRecommendation', methods=['GET'])
 def recommendation_post():
     return wine_db.get_recommendation_fast()
+
 
 def is_recommended_by(recommendation_json, recommender_alg, id):
     wines = recommendation_json[recommender_alg]
@@ -57,6 +63,7 @@ def is_recommended_by(recommendation_json, recommender_alg, id):
             return False
 
     return False
+
 
 @app.route('/AddTransactions', methods=['POST'])
 def transactions_post():
@@ -76,25 +83,31 @@ def transactions_post():
 
     return "Added Transactions Succesfully."
 
+
 @ app.route('/GetOffers', methods=['GET'])
 def get_all_offers():
     return wine_db.get_all_offers()
+
 
 @ app.route('/GetFromTimestamp/<arg>', methods=['GET'])
 def get_offers_from_timestamp(arg):
     return wine_db.get_offers_from_timestamp(arg)
 
+
 @ app.route('/GetOfferById/<arg>', methods=['GET'])
 def get_offer_by_id(arg):
     return wine_db.get_offer_by_id(arg)
+
 
 @ app.route('/GetTransactions', methods=['GET'])
 def get_all_transactions():
     return wine_db.get_all_transactions()
 
+
 @ app.route('/GetTransactionById/<arg>', methods=['GET'])
 def get_transaction_by_id(arg):
     return wine_db.get_transaction_by_id(arg)
 
+
 if (__name__ == "__main__"):
-    app.run(host = '0.0.0.0', port = 49502)
+    app.run(host='0.0.0.0', port=49502)
