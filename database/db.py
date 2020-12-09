@@ -180,6 +180,33 @@ class wine_db:
         self.connection.close()
         return flask.jsonify([dict(ix) for ix in rows])
 
+    # Generates WHERE clause for equality for list of IDs.
+    def _gen_id_where(self, lhs, ids):
+        where = ""
+
+        for id in ids:
+            where += (lhs + '=' + str(id) + ' OR ')
+
+        where = where[:-4]
+        return where
+
+    # TODO: Returns an empty array.
+    # Same as get_all_offers, but only those with ID in given list of IDs.
+    def get_all_specified_offers(self, ids):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+        rows = c.execute('''SELECT *
+                            FROM ((SELECT * 
+                                    FROM offers 
+                                    WHERE ?) AS offers LEFT OUTER JOIN global_price ON offers.linkedWineLwin=global_price.LWIN_FK) AS o''', 
+                                        [self._gen_id_where("offers.id", ids)]).fetchall()
+        self.connection.close()
+        return flask.jsonify([dict(ix) for ix in rows])
+
     # Returns all stored transactions.
     def get_all_transactions(self):
         if (self.connection == None):

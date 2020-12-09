@@ -22,6 +22,7 @@ tokens = {
     "third": 4279874232
 }
 
+# Standard route for GET requests.
 @app.route('/', methods = ['GET'])
 def main_page():
     return '''POST: /data/transactions/ body: JSON transaction data. -> Upload transaction data to database.\r\n
@@ -50,6 +51,7 @@ def db_get():
     mtx = False
     return response.content
 
+# Handles GET request fron UI for get all transactions from database component.
 @app.route('/transactions', methods = ['GET'])
 def db_get_transactions():
     global mtx
