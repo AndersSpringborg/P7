@@ -185,7 +185,7 @@ class wine_db:
         where = ""
 
         for id in ids:
-            where += (lhs + '=' + str(id) + ' OR ')
+            where += (lhs + '=\'' + id + '\' OR ')
 
         where = where[:-4]
         return where
@@ -196,14 +196,15 @@ class wine_db:
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
+        print(self._gen_id_where("offers.id", ids))
+
         self.open_connection()
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
         rows = c.execute('''SELECT *
                             FROM ((SELECT * 
                                     FROM offers 
-                                    WHERE ?) AS offers LEFT OUTER JOIN global_price ON offers.linkedWineLwin=global_price.LWIN_FK) AS o''', 
-                                        [self._gen_id_where("offers.id", ids)]).fetchall()
+                                    WHERE ''' + self._gen_id_where("offers.id", ids) + ') AS offers LEFT OUTER JOIN global_price ON offers.linkedWineLwin=global_price.LWIN_FK) AS o').fetchall()
         self.connection.close()
         return flask.jsonify([dict(ix) for ix in rows])
 
@@ -426,7 +427,7 @@ class wine_db:
 
         for wine in sql_wineoffers:
             print("Inserting wine: " + wine.originalOfferText +
-                  " with ID: " + wine.offerId)
+                  " with ID: " + wine.id)
             cursor = self.connection.cursor()
             cursor.execute('''INSERT OR IGNORE INTO offers(
                                               offerId,
