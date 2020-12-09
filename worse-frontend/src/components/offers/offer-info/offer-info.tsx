@@ -44,25 +44,53 @@ export default function OfferTable() {
             {wines[0]?.wineName} {wines[0]?.year}{" "}
           </div>
           <div
-            className="site-layout-background"
-            style={{ padding: 24, minHeight: 360 }}
+            //style={{ padding: 24, minHeight: 360 }}
           >
-            <Row justify="center">
-              <Col style={{ width: "100vh" }}>
-                <Row>
-                  <span className="text">
-                    Price: {wines[0]?.price} {wines[0]?.currency}
-                  </span>
-                </Row>
-                <Divider />
-                <Row>
-                  <span className="text">Quantity: {wines[0]?.quantity}</span>
-                </Row>
-              </Col>
-            </Row>
-            <div style={{ height: "60px" }}></div>
             <Row style={{ justifyContent: "center" }}>
-              <Row justify="center">
+              <Row justify="center" className="infoBox">
+                <Col style={{ width: "40vh" }}>
+                  <h1 className="header2Text">Offer & Supplier</h1>
+                  <Col>
+                    <Row>
+                      <span className="text">
+                        Price: {wines[0]?.price} {wines[0]?.currency}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Quantity: {wines[0]?.quantity}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Name: {wines[0]?.supplierName}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Email: {wines[0]?.supplierEmail}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Original offer text: {wines[0]?.originalOfferText}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Created at: {wines[0]?.createdAt}
+                      </span>
+                    </Row>
+                  </Col>
+                </Col>
+              </Row>
+              <div style={{ width: "110px" }}/>
+              <Row justify="center" className="infoBox">
                 <Col style={{ width: "40vh" }}>
                   <h1 className="header2Text">Wine</h1>
                   <Col>
@@ -105,7 +133,7 @@ export default function OfferTable() {
                 </Col>
               </Row>
               <div style={{ width: "110px" }}></div>
-              <Row justify="center">
+              <Row justify="center" className="infoBox">
                 <Col style={{ width: "40vh" }}>
                   <h1 className="header2Text">Packaging</h1>
                   <Col>
@@ -131,37 +159,6 @@ export default function OfferTable() {
                     <Row>
                       <span className="text">
                         Bottle size (numerical): {wines[0]?.bottleSizeNumerical}
-                      </span>
-                    </Row>
-                  </Col>
-                </Col>
-              </Row>
-              <div style={{ width: "110px" }}></div>
-              <Row justify="center">
-                <Col style={{ width: "40vh" }}>
-                  <h1 className="header2Text">Supplier & Offer</h1>
-                  <Col>
-                    <Row>
-                      <span className="text">
-                        Name: {wines[0]?.supplierName}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Email: {wines[0]?.supplierEmail}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Original offer text: {wines[0]?.originalOfferText}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Created at: {wines[0]?.createdAt}
                       </span>
                     </Row>
                   </Col>

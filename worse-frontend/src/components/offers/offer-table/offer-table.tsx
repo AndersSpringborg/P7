@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Table, Input, Button, Space, Spin } from "antd";
+import { Table, Input, Button, Space, Spin, Dropdown, Menu, Row } from "antd";
 import Highlighter from "react-highlight-words";
-import { SearchOutlined } from "@ant-design/icons";
+import { CheckOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-table.scss";
@@ -10,6 +10,7 @@ import "./offer-table.scss";
 export default function OfferTable() {
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [chosenDropdownItem, setChosenDropdownItem] = useState<number>(0);
   const [searchState, setSearchState] = useState<{
     searchText: any;
     searchedColumn: any;
@@ -127,6 +128,24 @@ export default function OfferTable() {
     setSearchState({ searchText: "", searchedColumn: "" });
   };
 
+  const DropdownItems = (
+    <Menu>
+      <Menu.Item key="0" onClick={e => setChosenDropdownItem(0)}>
+        Support Vector Machine {chosenDropdownItem === 0? <CheckOutlined /> : <div/>}
+      </Menu.Item>
+      <Menu.Item key="1" onClick={e => setChosenDropdownItem(1)}>
+        Naive Bayes {chosenDropdownItem === 1? <CheckOutlined /> : <div/>}
+      </Menu.Item >
+      <Menu.Item key="2" onClick={e => setChosenDropdownItem(2)}>
+        Logistic Regression {chosenDropdownItem === 2? <CheckOutlined /> : <div/>}
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="3" onClick={e => setChosenDropdownItem(3)}>
+        Show all offers {chosenDropdownItem === 3? <CheckOutlined /> : <div/>}
+      </Menu.Item>
+    </Menu>
+  );
+
   // Defines the columns for the offer table
   const offerTableColumns = [
     {
@@ -184,6 +203,14 @@ export default function OfferTable() {
         className="site-layout-background"
         style={{ padding: 24, minHeight: 360 }}
       >
+        <Row justify={"end"}>
+          <Dropdown overlay={DropdownItems} trigger={['click']} >
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+              Choose recommendation algorithm <DownOutlined />
+            </a>
+          </Dropdown>
+        </Row>
+        <div style={{ height: "30px" }}></div>
         {loading ? (
           <div className="spin">
             <Spin size="large" />
