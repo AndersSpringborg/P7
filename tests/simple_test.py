@@ -5,7 +5,6 @@ import subprocess as proc
 import threading
 import time
 
-
 def start_services():
     api = threading.Thread(target = proc.run, args = (['python3', '../API/api.py', 'local'],))
     db = threading.Thread(target = proc.run, args = (['python3', '../database/apiDB.py'],))
@@ -14,7 +13,6 @@ def start_services():
     db.start()
     recommender.start()
     time.sleep(3)
-
 
 def test_components():
     start_services()
