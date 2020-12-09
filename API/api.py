@@ -26,6 +26,8 @@ tokens = {
 # Standard route for GET requests.
 @app.route('/', methods = ['GET'])
 def main_page():
+    print("Lock:" + str(lock))
+    print("Mtx:" + str(mtx))
     return '''POST: /data/transactions/ body: JSON transaction data. -> Upload transaction data to database.\r\n
             POST: /data/wine_deals/ body: JSON wine deals data. -> Upload wine deals data to database.\r\n'
             POST: /db_post/ body: Database content. -> Uploads raw content to insert into database.\r\n'
@@ -252,7 +254,7 @@ if __name__ == "__main__":
             DB_DOMAIN = 'http://127.0.0.1:' + str(DB_PORT)
             RECOMMENDER_DOMAIN = 'http://127.0.0.1:' + str(RECOMMENDER_PORT)
 
-        elif (sys.argv[1] == 'nolock' or (len(sys.argv) >= 3 and sys.argv[2] == 'nolock')):
+        if (sys.argv[1] == 'nolock' or (len(sys.argv) >= 3 and sys.argv[2] == 'nolock')):
             lock = False
 
     app.run(host = '0.0.0.0', port = 49500)
