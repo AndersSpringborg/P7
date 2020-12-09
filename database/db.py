@@ -202,9 +202,9 @@ class wine_db:
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
         rows = c.execute('''SELECT *
-                            FROM ((SELECT * 
+                            FROM (SELECT * 
                                     FROM offers 
-                                    WHERE ''' + self._gen_id_where("offers.id", ids) + ') AS offers LEFT OUTER JOIN global_price ON offers.linkedWineLwin=global_price.LWIN_FK) AS o').fetchall()
+                                    WHERE ''' + self._gen_id_where("offers.id", ids) + ') AS offers LEFT OUTER JOIN global_price ON offers.linkedWineLwin=global_price.LWIN_FK').fetchall()
         self.connection.close()
         return flask.jsonify([dict(ix) for ix in rows])
 
