@@ -21,8 +21,15 @@ def offers_post():
             offers.append(wine_db.create_offer_obj(current_offer))
 
     wine_db.add_wineoffers(offers)
+    return wine_db.get_all_specified_offers(offer_id_list(offers))
 
-    return wine_db.get_all_offers()
+def offer_id_list(offers):
+    ids = list()
+
+    for offer in offers:
+        ids.append(offer.id)
+
+    return ids
 
 # Reads JSON array of global prices into list of Global_Price objects.
 # They are then inserted.
