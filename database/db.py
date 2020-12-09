@@ -199,14 +199,18 @@ class wine_db:
         self.open_connection()
         self.connection.row_factory = sqlite3.Row
         c = self.connection.cursor()
-        rows = c.execute('''SELECT *
+        """rows = c.execute('''SELECT *
                             FROM ((SELECT * 
                                     FROM offers 
                                     WHERE ?) AS offers LEFT OUTER JOIN global_price ON offers.linkedWineLwin=global_price.LWIN_FK) AS o''', 
-                                        [self._gen_id_where("offers.id", ids)]).fetchall()
+                                        [self._gen_id_where("offers.id", ids)]).fetchall()"""
+        for i in ids:
+            sql_rows = c.execute("SELECT global_price FROM global_price WHERE LWIN_FK ="+str(i)).fetchall()
+            print(dict(sql_rows)
+
         self.connection.close()
         return flask.jsonify([dict(ix) for ix in rows])
-
+    
     # Returns all stored transactions.
     def get_all_transactions(self):
         if (self.connection == None):
@@ -522,4 +526,5 @@ class wine_db:
                                  transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'], str(transaction['id']))
     
     def create_artificial_offer_obj(self, offer_df_row):
-        return Offer_Class(str(offer_df_row['id']), 'supplierNameArtificial', 'supplier@articial.com', offer_df_row['LWIN No_'], offer_df_row['originalOfferText'], offer_df_row['producer'], offer_df_row['wineName'], offer_df_row['quantity'], offer_df_row['year'], offer_df_row['price'], offer_df_row['currency'], offer_df_row['isOWC'], offer_df_row['isOC'], offer_df_row['isIB'], offer_df_row['bottlesPerCase'], offer_df_row['bottleSize'], offer_df_row['bottleSizeNumerical'], offer_df_row['region'], offer_df_row['subRegion'], offer_df_row['colour'], offer_df_row['createdAt'], str(offer_df_row['offer']['id']))
+        return Offer_Class(str(offer_df_row['offer']['id']), 'supplierNameArtificial', 'supplier@articial.com', offer_df_row['LWIN No_'], offer_df_row['originalOfferText'], offer_df_row['producer'], offer_df_row['wineName'], offer_df_row['quantity'], offer_df_row['year'], offer_df_row['price'], offer_df_row['currency'], offer_df_row['isOWC'], offer_df_row['isOC'], offer_df_row['isIB'], offer_df_row['bottlesPerCase'], offer_df_row['bottleSize'], offer_df_row['bottleSizeNumerical'], offer_df_row['region'], offer_df_row['subRegion'], offer_df_row['colour'], offer_df_row['createdAt'], str(offer_df_row['id']))
+    

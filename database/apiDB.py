@@ -14,14 +14,17 @@ wine_db = db.wine_db()
 def offers_post():
     offers = []
     offers_data = request.get_json()
-    
+    offer_ids= []
     for offer in offers_data:
+        offer_ids.append(offer['id'])
         current_offer = wine_db.clean_offers_data(offer)
         if current_offer is not None:
             offers.append(wine_db.create_offer_obj(current_offer))
-
+            
+            
+    print(offer_ids)
     wine_db.add_wineoffers(offers)
-    return wine_db.get_all_specified_offers(offer_id_list(offers))
+    return wine_db.get_all_specified_offers(offer_ids)
 
 def offer_id_list(offers):
     ids = list()

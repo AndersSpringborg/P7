@@ -165,7 +165,7 @@ def wine_deals_post():
     if (int(db_response.status_code) >= 400):
         mtx = False
         make_response('Database component error', db_response.status_code)
-
+    print(db_response.text)
     merged = {
         "WineDeals": json.loads(db_response.text),
         "model_type": json_in['model_type']
