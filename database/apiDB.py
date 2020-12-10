@@ -44,7 +44,19 @@ def new_recommendation_post():
 
 @app.route('/GetRecommendation', methods = ['GET'])
 def recommendation_post():
-    return wine_db.get_recommendation()
+    return wine_db.get_recommendation_fast()
+
+def is_recommended_by(recommendation_json, recommender_alg, id):
+    wines = recommendation_json[recommender_alg]
+
+    for wine in wines:
+        if (wine['id'] == id and wine['offers_FK'] != None):
+            return True
+
+        elif (wine['id'] == id):
+            return False
+
+    return False
 
 @app.route('/AddTransactions', methods=['POST'])
 def transactions_post():
@@ -79,6 +91,10 @@ def get_offer_by_id(arg):
 @ app.route('/GetTransactions', methods=['GET'])
 def get_all_transactions():
     return wine_db.get_all_transactions()
+
+@ app.route('/GetTransactionById/<arg>', methods=['GET'])
+def get_transaction_by_id(arg):
+    return wine_db.get_transaction_by_id(arg)
 
 if (__name__ == "__main__"):
     app.run(host = '0.0.0.0', port = 49502)

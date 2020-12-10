@@ -13,8 +13,6 @@ def start_services():
     rec_pid = subprocess.Popen(["python3", "../recommender/webapp.py"]).pid
     time.sleep(3)
 
-    return [api_pid, db_pid, rec_pid]
-
 def stop_services(pids):
     for pid in pids:
         os.kill(pid, 9)
