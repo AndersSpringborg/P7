@@ -18,13 +18,49 @@ export default function OfferTable() {
   }>();
   const [searchInput, setSearchInput] = useState<any>(null);
 
-  // Endpoint for retrieval of the wine offers from after a given timestamp
+  // Endpoint for retrieval of the wine offers from after a given timestamp.
   const getOffersURL = "http://localhost:49500/recommendation";
 
+  // Requests the wine offer data from the database.
+  const fetchData = async () => {
+    setLoading(true);
+    const response = await axios.get(getOffersURL, {
+      headers: {
+        'X-Token': 23984728947
+      }
+    });
+    setOffers(response.data);
+    setLoading(false);
+
+    return response.data;
+  };
+
+  // A React hook that fetches data when the component is mounted.
   useEffect(() => {
     fetchData();
   }, []);
 
+
+  // Defines the dropdown elements for the, which recommender algorithm to filter on.
+  const DropdownItems = (
+    <Menu>
+      <Menu.Item key="0" onClick={e => setChosenDropdownItem(0)}>
+        Support Vector Machine {chosenDropdownItem === 0? <CheckOutlined /> : <div/>}
+      </Menu.Item>
+      <Menu.Item key="1" onClick={e => setChosenDropdownItem(1)}>
+        Naive Bayes {chosenDropdownItem === 1? <CheckOutlined /> : <div/>}
+      </Menu.Item >
+      <Menu.Item key="2" onClick={e => setChosenDropdownItem(2)}>
+        Logistic Regression {chosenDropdownItem === 2? <CheckOutlined /> : <div/>}
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="3" onClick={e => setChosenDropdownItem(3)}>
+        Show all offers {chosenDropdownItem === 3? <CheckOutlined /> : <div/>}
+      </Menu.Item>
+    </Menu>
+  );
+
+  // Filters the data for the table depending on the chosen recommender algorithm.
   useEffect(() => {
     if(chosenDropdownItem === 0) {
       setData(offers.filter(x => x.svm_key != null));
@@ -37,27 +73,27 @@ export default function OfferTable() {
     }
   }, [chosenDropdownItem, offers]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const response = await axios.get(getOffersURL, {
-      headers: {
-        'X-Token': 23984728947
-      }
-    });
+  const handleDropdownItem = () => {
+    if(chosenDropdownItem === 0) {
+      return "Support Vector Machine";
+    } else if (chosenDropdownItem === 1) {
+      return "Naive Bayes";
+    } else if (chosenDropdownItem === 2) {
+      return "Logistic Regression";
+    } else {
+      return "Show all offers"
+    }
+  } 
 
-    setOffers(response.data);
-    setLoading(false);
 
-    return response.data;
-  };
-
-  // Handles the routing for accessing a particular wine offer page
+  // Handles the routing for accessing a particular wine offer page.
   let history = useHistory();
   function handleRowClick(id: string) {
     history.push(`/wineOffer/${id}`);
   }
 
-  // Creates the search functionality on the different columns in the offer table
+
+  // Creates the search functionality on the different columns in the offer table.
   const getColumnSearchProps = (dataIndex: any, key?: any) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -126,6 +162,7 @@ export default function OfferTable() {
       ),
   });
 
+  // Functionality for pressing search button.
   const handleSearch = (selectedKeys: any, confirm: any, dataIndex: any) => {
     confirm();
     setSearchState({
@@ -134,31 +171,15 @@ export default function OfferTable() {
     });
   };
 
+  // Functionality for resetting the searchfield.
   const handleReset = (clearFilters: any) => {
     clearFilters();
     setSearchState({ searchText: "", searchedColumn: "" });
   };
 
-  const DropdownItems = (
-    <Menu>
-      <Menu.Item key="0" onClick={e => setChosenDropdownItem(0)}>
-        Support Vector Machine {chosenDropdownItem === 0? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-      <Menu.Item key="1" onClick={e => setChosenDropdownItem(1)}>
-        Naive Bayes {chosenDropdownItem === 1? <CheckOutlined /> : <div/>}
-      </Menu.Item >
-      <Menu.Item key="2" onClick={e => setChosenDropdownItem(2)}>
-        Logistic Regression {chosenDropdownItem === 2? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="3" onClick={e => setChosenDropdownItem(3)}>
-        Show all offers {chosenDropdownItem === 3? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-    </Menu>
-  );
 
-  // Defines the columns for the offer table
-  const offerTableColumns = [
+   // Defines the columns for the offer table.
+   const offerTableColumns = [
     {
       title: "Id",
       dataIndex: "id",
@@ -217,7 +238,7 @@ export default function OfferTable() {
         <Row justify={"end"}>
           <Dropdown overlay={DropdownItems} trigger={['click']} >
             <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              Choose recommendation algorithm <DownOutlined />
+              {handleDropdownItem()}  <DownOutlined />
             </a>
           </Dropdown>
         </Row>

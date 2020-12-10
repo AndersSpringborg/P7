@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { Row, Col, Divider, Spin } from "antd";
-import { LeftCircleOutlined } from "@ant-design/icons";
+import { EnvironmentOutlined, EuroOutlined, ExperimentOutlined, EyeOutlined, FieldNumberOutlined, FieldTimeOutlined, FrownOutlined, GifOutlined, GiftOutlined, GlobalOutlined, GoldOutlined, HourglassOutlined, LeftCircleOutlined, MailOutlined, MessageOutlined, UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-info.scss";
@@ -52,36 +52,53 @@ export default function WineInfo() {
                   <h1 className="header2Text">Offer & Supplier</h1>
                   <Col>
                     <Row>
+                      <div className="icon">
+                        <EuroOutlined/>
+                      </div>
                       <span className="text">
                         Price: {wines[0]?.price} {wines[0]?.currency}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <GoldOutlined/>
+                      </div>
                       <span className="text">
                         Quantity: {wines[0]?.quantity}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <UserOutlined/>
+                      </div>
                       <span className="text">
                         Name: {wines[0]?.supplierName}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <MailOutlined/>
+                      </div>
                       <span className="text">
                         Email: {wines[0]?.supplierEmail}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
-                      <span className="text">
-                        Original offer text: {wines[0]?.originalOfferText}
-                      </span>
+                      <div className="icon">
+                        <MessageOutlined/>
+                      </div>
+                      <span className="text"> Original offer text: </span>
+                      <span className="text" style={{ margin: "10px 0px 0px 50px" }}> {wines[0]?.originalOfferText} </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <FieldTimeOutlined/>
+                      </div>
                       <span className="text">
                         Created at: {wines[0]?.createdAt}
                       </span>
@@ -95,36 +112,57 @@ export default function WineInfo() {
                   <h1 className="header2Text">Wine</h1>
                   <Col>
                     <Row>
+                      <div className="icon">
+                        <EyeOutlined/>
+                      </div>
                       <span className="text">
-                        Wine name: {wines[0]?.wineName}
+                        Name: {wines[0]?.wineName}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
-                      <span className="text">
+                      <div className="icon">
+                        <UserOutlined/>
+                      </div>
+                      <div className="text">
                         Producer: {wines[0]?.producer}
-                      </span>
+                      </div>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <GlobalOutlined/>
+                      </div>
                       <span className="text">Region: {wines[0]?.region}</span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <EnvironmentOutlined/>
+                      </div>
                       <span className="text">
                         Sub Region: {wines[0]?.subRegion}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <HourglassOutlined/>
+                      </div>
                       <span className="text">Year: {wines[0]?.year}</span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <ExperimentOutlined/>
+                      </div>
                       <span className="text">Colour: {wines[0]?.colour}</span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <FieldNumberOutlined/>
+                      </div>
                       <span className="text">
                         LWIN: {wines[0]?.linkedWineLwin}
                       </span>
@@ -138,25 +176,37 @@ export default function WineInfo() {
                   <h1 className="header2Text">Packaging</h1>
                   <Col>
                     <Row>
+                      <div className="icon">
+                        <GiftOutlined/>
+                      </div>
                       <span className="text">
-                        Package Feaures: {wines[0]?.isOWC} {wines[0]?.isOC}{" "}
+                        Package Features: {wines[0]?.isOWC} {wines[0]?.isOC}{" "}
                         {wines[0]?.isIB}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <GoldOutlined/>
+                      </div>
                       <span className="text">
                         Bottles per case: {wines[0]?.bottlesPerCase}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <ExperimentOutlined/>
+                      </div>
                       <span className="text">
                         Bottle size: {wines[0]?.bottleSize}
                       </span>
                     </Row>
                     <Divider />
                     <Row>
+                      <div className="icon">
+                        <ExperimentOutlined/>
+                      </div>
                       <span className="text">
                         Bottle size (numerical): {wines[0]?.bottleSizeNumerical}
                       </span>
