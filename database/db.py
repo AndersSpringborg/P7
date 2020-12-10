@@ -518,12 +518,15 @@ class wine_db:
         cursor = self.connection.cursor()
 
         lwinnumbers = []
+        offer_ids = []
         for offer in offers:
+            offer_ids.append(str(offer.id))
             lwinnumbers.append(str(offer.linkedWineLwin))
-        sql_condition = "(" + ', '.join(lwinnumbers) + ")"
+        sql_condition_lwin = "(" + ', '.join(lwinnumbers) + ")"
+        sql_condition_ids = "(" + ', '.join(offer_ids) + ")"
 
-        sql = "SELECT * FROM offers LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
-            sql_condition + ") global_price" + " ON offers.linkedWineLwin=global_price.LWIN_FK"
+        sql = "SELECT * FROM offers WHERE id IN " + sql_condition_ids + " LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
+            sql_condition_lwin + ") global_price" + " ON offers.linkedWineLwin=global_price.LWIN_FK"
 
         rows = cursor.execute(sql).fetchall()
 
