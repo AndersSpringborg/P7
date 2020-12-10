@@ -525,7 +525,7 @@ class wine_db:
         sql_condition_lwin = "(" + ', '.join(lwinnumbers) + ")"
         sql_condition_ids = "(" + ', '.join(offer_ids) + ")"
 
-        sql = "SELECT * FROM offers WHERE id IN " + sql_condition_ids + " LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
+        sql = "SELECT * FROM (SELECT * FROM offers WHERE id IN " + sql_condition_ids + ") LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
             sql_condition_lwin + ") global_price" + " ON offers.linkedWineLwin=global_price.LWIN_FK"
 
         rows = cursor.execute(sql).fetchall()
