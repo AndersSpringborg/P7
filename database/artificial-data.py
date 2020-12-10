@@ -29,7 +29,7 @@ def main():
 
     trans_offer_df = pd.merge(offers_df, transa_df, how="left", on='LWIN No_')
     trans_offer_df = trans_offer_df.drop_duplicates(subset=['No_', 'Amount'])
-    #trans_offer_df = trans_offer_df.head(10)
+    trans_offer_df = trans_offer_df.head(5000)
 
     artificial_offers = []
     artificial_trans = []

@@ -22,7 +22,6 @@ def offers_post():
             offers.append(wine_db.create_offer_obj(current_offer))
 
     wine_db.add_wineoffers(offers)
-
     return wine_db.get_global_price_for_offers(offers)
 
 # Reads JSON array of global prices into list of Global_Price objects.
@@ -31,11 +30,16 @@ def offers_post():
 
 @app.route('/AddGlobalPrices', methods=['POST'])
 def global_prices_post():
-    prices = []
-    json_prices = request.get_json()
+    data = io.StringIO(request.data.decode('UTF-8'))
+    df = pd.read_csv(data)
 
-    for json_price in json_prices:
-        prices.append(db.Global_Price.from_json(json_price))
+    prices_data = df.to_dict(orient='record')
+    prices = []
+
+    for data_entry in prices_data:
+        global_price = db.Global_Price(
+            data_entry['WineLWIN'], data_entry['WinePrice1'], data_entry['WineYear'])
+        prices.append(global_price)
 
     wine_db.add_global_prices(prices)
     return ""

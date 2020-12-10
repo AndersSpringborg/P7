@@ -126,7 +126,7 @@ def global_prices_post():
         pass
 
     response = requests.post(
-        DB_DOMAIN + '/AddGlobalPrices', json=request.get_json())
+        DB_DOMAIN + '/AddGlobalPrices', data=request.data)
 
     if (int(response.status_code) >= 400):
         mtx = False

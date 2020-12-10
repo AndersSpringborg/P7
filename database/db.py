@@ -390,7 +390,7 @@ class wine_db:
         self.open_connection()
 
         for price in prices:
-            print("Inserting global price: " + price.tostring())
+            print("Inserting global price: " + str(price.lwin))
             cursor = self.connection.cursor()
             cursor.execute('''INSERT OR IGNORE INTO global_price(
                                             LWIN_FK,
@@ -520,13 +520,14 @@ class wine_db:
         lwinnumbers = []
         offer_ids = []
         for offer in offers:
-            offer_ids.append(str(offer.id))
-            lwinnumbers.append(str(offer.linkedWineLwin))
+            offer_ids.append(repr(offer.id))
+            lwinnumbers.append(repr(offer.linkedWineLwin))
+
         sql_condition_lwin = "(" + ', '.join(lwinnumbers) + ")"
         sql_condition_ids = "(" + ', '.join(offer_ids) + ")"
 
-        sql = "SELECT * FROM (SELECT * FROM offers WHERE id IN " + sql_condition_ids + ") LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
-            sql_condition_lwin + ") global_price" + " ON offers.linkedWineLwin=global_price.LWIN_FK"
+        sql = "SELECT * FROM (SELECT * FROM offers WHERE id IN " + sql_condition_ids + ") offers LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
+            sql_condition_lwin + ") global_price ON offers.linkedWineLwin=global_price.LWIN_FK"
 
         rows = cursor.execute(sql).fetchall()
 
