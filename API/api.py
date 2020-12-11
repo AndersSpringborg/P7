@@ -22,8 +22,8 @@ tokens = {
     "third": 4279874232
 }
 
-
-@app.route('/', methods=['GET'])
+# Standard route for GET requests.
+@app.route('/', methods = ['GET'])
 def main_page():
     return '''POST: /data/transactions/ body: JSON transaction data. -> Upload transaction data to database.\r\n
             POST: /data/wine_deals/ body: JSON wine deals data. -> Upload wine deals data to database.\r\n'
@@ -53,8 +53,8 @@ def db_get():
     mtx = False
     return response.content
 
-
-@app.route('/transactions', methods=['GET'])
+# Handles GET request fron UI for get all transactions from database component.
+@app.route('/transactions', methods = ['GET'])
 def db_get_transactions():
     global mtx
 
