@@ -32,8 +32,6 @@ def main_page():
             GET: /recommendation_get/ -> Gets recommended wine deals.'''
 
 # Handles GET request from UI for database content.
-
-
 @app.route('/recommendation', methods=['GET'])
 def db_get():
     global mtx
@@ -74,8 +72,6 @@ def db_get_transactions():
     return response.content
 
 # Gets single wine by given wine ID.
-
-
 @app.route('/wine/<arg>', methods=['GET'])
 def get_wine(arg):
     global mtx
@@ -93,8 +89,6 @@ def get_wine(arg):
     return response.content
 
 # Gets single transaction by given ID.
-
-
 @app.route('/transaction/<arg>', methods=['GET'])
 def get_transaction(arg):
     global mtx
@@ -113,8 +107,6 @@ def get_transaction(arg):
 
 # Handles POST request from 3rd party to add global wine prices.
 # Appends new global wine prices to db.
-
-
 @app.route('/global_prices', methods=['POST'])
 def global_prices_post():
     global mtx
@@ -160,8 +152,6 @@ def transactions_post():
 
 # Handles POST request from 3rd party to add wine deals data.
 # Retrieves copy of wine deals relation and sends it to recommender API.
-
-
 @app.route('/data/wine_deals', methods=['POST'])
 def wine_deals_post():
     global mtx
@@ -204,8 +194,6 @@ def wine_deals_post():
 
 # Handles POST request from 3rd party to set data interval.
 # Retrieves copy of transactions relation and wine deals relation within specified time interval and sends it to recommender API.
-
-
 @app.route('/data/time', methods=['POST'])
 def interval_post():
     global mtx
@@ -243,8 +231,6 @@ def interval_post():
     return ""
 
 # Parses POST request body of time interval.
-
-
 def parse_time_interval(json):
     if 'TimeInterval' not in json:
         return False
@@ -252,8 +238,6 @@ def parse_time_interval(json):
     return 'Time' in json['TimeInterval'] and 'model_type' in json['TimeInterval']
 
 # Compare-And-Swap mechanism for busy waiting.
-
-
 def compare_swap(expected, new):
     global mtx
     actual = mtx
