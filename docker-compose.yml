@@ -3,16 +3,19 @@ version: "3.3"
 services:
 
     central-api:
+        image: python:3.9.0-slim-buster
         build: ./API/
         ports:
         - 49500:49500
 
     database:
+        image: python:3.9.0-slim-buster
         build: ./database/
         ports:
         - 49502:49500
 
     recommender:
+        image: python:3.9.0-slim-buster
         build: ./recommender/
         ports:
         - 49501:49500
