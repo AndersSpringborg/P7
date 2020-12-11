@@ -89,7 +89,7 @@ export default function OfferTable() {
   // Handles the routing for accessing a particular wine offer page.
   let history = useHistory();
   function handleRowClick(id: string) {
-    history.push(`/wineOffer/${id}`);
+    history.push(`/offers/${id}`);
   }
 
 

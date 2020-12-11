@@ -7,12 +7,13 @@ import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-info.scss";
 
-export default function WineInfo() {
+export default function OfferInfo() {
   const [wines, setWines] = useState<WineOffer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { id }: any = useParams();
   const apiURL = `http://localhost:49500/wine/${id || ""}`;
+  
   useEffect(() => {
     fetchData();
   }, []);

@@ -28,7 +28,7 @@ export default function WorstLayout (props: any) {
   }
 
   const handleOfferClick = () => {
-    history.push(`/`);
+    history.push(`/offers`);
   }
 
     return (
@@ -41,7 +41,7 @@ export default function WorstLayout (props: any) {
               <Image className="juleimg" src={logo} alt="ant image" />
             )}
           </div>
-          <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+          <Menu theme="dark" mode="inline">
             <Menu.Item key="1" icon={<UnorderedListOutlined />} onClick={handleOfferClick}>
               Offers
             </Menu.Item>
