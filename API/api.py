@@ -11,8 +11,8 @@ mtx = False
 
 DB_PORT = 49502
 RECOMMENDER_PORT = 49501
-DB_DOMAIN = 'http://localhost:' + str(DB_PORT)
-RECOMMENDER_DOMAIN = 'http://localhost:' + str(RECOMMENDER_PORT)
+DB_DOMAIN = 'http://worse-db:' + str(DB_PORT)
+RECOMMENDER_DOMAIN = 'http://worse-recommender:' + str(RECOMMENDER_PORT)
 
 # Dictionary of tokens for each component.
 tokens = {
