@@ -87,6 +87,23 @@ def get_wine(arg):
     mtx = False
     return response.content
 
+# Handles GET request for offers by LWIN.
+@app.route('/offersFromLwin/', methods = ['GET'])
+def get_offers_by_LWIN():
+    global mtx
+
+    while compare_swap(False, True):
+        pass
+
+    response = requests.get(DB_DOMAIN + '/GetOffersByLWIN/?id='+request.args.get('id') + "&lwin="+request.args.get('lwin'))
+    
+    if (int(response.status_code) >= 400):
+        mtx = False
+        make_response('Database component error', response.status_code)
+
+    mtx = False
+    return response.content
+
 # Gets single transaction by given ID.
 @app.route('/transaction/<arg>', methods = ['GET'])
 def get_transaction(arg):

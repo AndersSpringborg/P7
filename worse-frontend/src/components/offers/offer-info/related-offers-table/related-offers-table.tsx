@@ -39,6 +39,7 @@ export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
   let history = useHistory();
   function handleRowClick(id: string) {
     history.push(`/offers/${id}`);
+    refreshPage();
   }
 
 
@@ -127,13 +128,20 @@ export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
   };
 
 
-   // Defines the columns for the offer table.
+  // Refreshes page.
+  const refreshPage = () => {
+    window.location.reload(false);
+  }
+
+
+   // Defines the columns for the related offer table.
    const offerTableColumns = [
     {
-      title: "Id",
-      dataIndex: "id",
-      key: "id",
-      ...getColumnSearchProps("id"),
+      title: "LWIN",
+      dataIndex: "linkedWineLwin",
+      key: "linkedWineLwin",
+      sorter: (a: any, b: any) => a.linkedWineLwin - b.linkedWineLwin,
+      ...getColumnSearchProps("linkedWineLwin"),
     },
     {
       title: "Wine Name",
@@ -143,18 +151,18 @@ export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
       ...getColumnSearchProps("wineName", "wine name"),
     },
     {
-      title: "Year",
-      dataIndex: "year",
-      key: "year",
-      sorter: (a: any, b: any) => a.year - b.year,
-      ...getColumnSearchProps("year"),
+      title: "Quantity",
+      dataIndex: "quantity",
+      key: "quantity",
+      sorter: (a: WineOffer, b: WineOffer) => a.quantity - b.quantity,
+      ...getColumnSearchProps("quantity"),
     },
     {
       title: "Price",
       dataIndex: "price",
       key: "price",
       width: "10%",
-      sorter: (a: any, b: any) => a.price - b.price,
+      sorter: (a: WineOffer, b: WineOffer) => a.price - b.price,
       ...getColumnSearchProps("price"),
     },
     {
@@ -171,9 +179,15 @@ export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
         },
       ],
       key: "currency",
-      onFilter: (value: any, record: any) =>
+      onFilter: (value: any, record: WineOffer) =>
         record.currency.indexOf(value) === 0,
       width: "10%",
+    },
+    {
+      title: "Price Difference",
+      dataIndex: "price_difference",
+      key: "price_difference",
+      sorter: (a: WineOffer, b: WineOffer) => a.price_difference - b.price_difference,
     },
   ];
 

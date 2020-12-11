@@ -27,6 +27,7 @@ class WineOffer {
   svm_key: string;
   price_difference: number;
   offers_FK: string;
+  price_difference: string;
 }
 
 class Transaction {

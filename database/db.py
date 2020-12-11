@@ -83,7 +83,7 @@ class wine_db:
                                     vendorId INT NOT NULL,
                                     postingGroup VARCHAR(20) NOT NULL,
                                     number VARCHAR(20) NOT NULL,
-                                    lwinnumber VARCHAR(20),
+                                    lwinnumber INT,
                                     description VARCHAR(20),
                                     measurementunit VARCHAR(20),
                                     quantity REAL,
