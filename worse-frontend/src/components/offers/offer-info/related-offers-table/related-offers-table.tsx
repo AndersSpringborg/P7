@@ -9,9 +9,7 @@ import "./related-offers-table.scss";
 
 export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
   const [offers, setOffers] = useState<WineOffer[]>([]);
-  const [data, setData] = useState<WineOffer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [chosenDropdownItem, setChosenDropdownItem] = useState<number>(3);
   const [searchState, setSearchState] = useState<{
     searchText: any;
     searchedColumn: any;
@@ -35,51 +33,6 @@ export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
   useEffect(() => {
     fetchData();
   }, []);
-
-
-  // Defines the dropdown elements for the, which recommender algorithm to filter on.
-  const DropdownItems = (
-    <Menu>
-      <Menu.Item key="0" onClick={e => setChosenDropdownItem(0)}>
-        Support Vector Machine {chosenDropdownItem === 0? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-      <Menu.Item key="1" onClick={e => setChosenDropdownItem(1)}>
-        Naive Bayes {chosenDropdownItem === 1? <CheckOutlined /> : <div/>}
-      </Menu.Item >
-      <Menu.Item key="2" onClick={e => setChosenDropdownItem(2)}>
-        Logistic Regression {chosenDropdownItem === 2? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="3" onClick={e => setChosenDropdownItem(3)}>
-        Show all offers {chosenDropdownItem === 3? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-    </Menu>
-  );
-
-  // Filters the data for the table depending on the chosen recommender algorithm.
-  useEffect(() => {
-    if(chosenDropdownItem === 0) {
-      setData(offers.filter(x => x.svm_key != null));
-    } else if (chosenDropdownItem === 1) {
-      setData(offers.filter(x => x.nb_key != null));
-    } else if (chosenDropdownItem === 2) {
-      setData(offers.filter(x => x.logit_key != null));
-    } else {
-      setData(offers);
-    }
-  }, [chosenDropdownItem, offers]);
-
-  const handleDropdownItem = () => {
-    if(chosenDropdownItem === 0) {
-      return "Support Vector Machine";
-    } else if (chosenDropdownItem === 1) {
-      return "Naive Bayes";
-    } else if (chosenDropdownItem === 2) {
-      return "Logistic Regression";
-    } else {
-      return "Show all offers"
-    }
-  } 
 
 
   // Handles the routing for accessing a particular wine offer page.
@@ -238,7 +191,7 @@ export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
         ) : (
           <Table
             columns={offerTableColumns}
-            dataSource={data}
+            dataSource={offers}
             onRow={(record, rowIndex) => {
               return {
                 onClick: (event) => {
