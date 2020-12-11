@@ -1,0 +1,18 @@
+version: "3.3"
+
+services:
+
+    central-api:
+        build: ./API/
+        ports:
+        - 49500:49500
+
+    database:
+        build: ./database/
+        ports:
+        - 49502:49500
+
+    recommender:
+        build: ./recommender/
+        ports:
+        - 49501:49500
