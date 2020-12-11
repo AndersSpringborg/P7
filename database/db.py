@@ -221,7 +221,7 @@ class wine_db:
 
         return flask.jsonify([dict(ix) for ix in rows])
 
-    # Finds speficic offer entity given ID in offers.
+    # Finds specific offer entity given ID in offers.
     def get_offer_by_id(self, id):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -232,6 +232,23 @@ class wine_db:
         c = self.connection.cursor()
         rows = c.execute(
             "SELECT * FROM offers WHERE id=?;", [id]).fetchall()
+
+        self.connection.close()
+
+        return flask.jsonify([dict(ix) for ix in rows])
+    
+    # Finds offers with similar LWIN.
+    def get_offers_by_LWIN(self, id, linkedWineLwin):
+        if (self.connection == None):
+            raise Exception("Wine database is closed.")
+
+        self.open_connection()
+
+        self.connection.row_factory = sqlite3.Row
+        c = self.connection.cursor()
+
+        rows = c.execute(
+            "SELECT * FROM offers WHERE linkedWineLwin=? AND id !=?;", [linkedWineLwin, id]).fetchall()
 
         self.connection.close()
 
@@ -508,12 +525,16 @@ class wine_db:
 
         self.open_connection()
         for offer in offers:
-            cursor = self.connection.cursor()
-            sql_row = cursor.execute("SELECT global_price FROM global_price WHERE LWIN_FK = " + str(offer.linkedWineLwin))
-            print('printing:...')
-            print(sql_row)
-            offer.global_price = 10
-        self.connection.commit()
+            offer_ids.append(str(offer.id))
+            lwinnumbers.append(str(offer.linkedWineLwin))
+        sql_condition_lwin = "(" + ', '.join(lwinnumbers) + ")"
+        sql_condition_ids = "(" + ', '.join(offer_ids) + ")"
+
+        sql = "SELECT * FROM (SELECT * FROM offers WHERE id IN " + sql_condition_ids + ") LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
+            sql_condition_lwin + ") global_price" + " ON offers.linkedWineLwin=global_price.LWIN_FK"
+
+        rows = cursor.execute(sql).fetchall()
+
         self.connection.close()
         print(offer_class_to_dict(offers))
         return offer_class_to_dict( offers)

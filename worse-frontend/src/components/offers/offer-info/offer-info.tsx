@@ -1,28 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
-import { Row, Col, Divider, Spin } from "antd";
-import { EnvironmentOutlined, EuroOutlined, ExperimentOutlined, EyeOutlined, FieldNumberOutlined, FieldTimeOutlined, FrownOutlined, GifOutlined, GiftOutlined, GlobalOutlined, GoldOutlined, HourglassOutlined, LeftCircleOutlined, MailOutlined, MessageOutlined, UserOutlined } from "@ant-design/icons";
+import { Row, Col, Divider, Spin, Table, Input, Space } from "antd";
+import { EnvironmentOutlined, EuroOutlined, ExperimentOutlined, EyeOutlined, FieldNumberOutlined, FieldTimeOutlined, GiftOutlined, GlobalOutlined, GoldOutlined, HourglassOutlined, LeftCircleOutlined, MailOutlined, MessageOutlined, PropertySafetyFilled, UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-info.scss";
+import RelatedOffersTable from "./related-offers-table/related-offers-table";
 
 export default function OfferInfo() {
-  const [wines, setWines] = useState<WineOffer[]>([]);
+  const [offer, setOffer] = useState<WineOffer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
+  
   const { id }: any = useParams();
-  const apiURL = `http://localhost:49500/wine/${id || ""}`;
+  const getOfferURL = `http://localhost:49500/wine/${id || ""}`;
+
+  const [lwin, setLwin] = useState<string>();
+  const [tableLoading, setTableLoading] = useState<boolean>(true);
+
   
   useEffect(() => {
-    fetchData();
+     fetchData();
   }, []);
+
+  useEffect(() => {
+    if(offer[0]?.linkedWineLwin != null) {
+      setLwin(offer[0].linkedWineLwin);
+      setTableLoading(false);
+    }
+ }, [offer]);
 
   const fetchData = async () => {
     setLoading(true);
-    const response = await axios.get(apiURL);
+    const response = await axios.get(getOfferURL);
 
-    setWines(response.data);
+    setOffer(response.data);
+
     setLoading(false);
     return response.data;
   };
@@ -42,7 +55,7 @@ export default function OfferInfo() {
         <>
           <div className="headerText">
             {" "}
-            {wines[0]?.wineName} {wines[0]?.year}{" "}
+            {offer[0]?.wineName} {offer[0]?.year}{" "}
           </div>
           <div
             //sstyle={{ padding: 24, minHeight: 360 }}
@@ -57,7 +70,7 @@ export default function OfferInfo() {
                         <EuroOutlined/>
                       </div>
                       <span className="text">
-                        Price: {wines[0]?.price} {wines[0]?.currency}
+                        Price: {offer[0]?.price} {offer[0]?.currency}
                       </span>
                     </Row>
                     <Divider />
@@ -66,7 +79,7 @@ export default function OfferInfo() {
                         <GoldOutlined/>
                       </div>
                       <span className="text">
-                        Quantity: {wines[0]?.quantity}
+                        Quantity: {offer[0]?.quantity}
                       </span>
                     </Row>
                     <Divider />
@@ -75,7 +88,7 @@ export default function OfferInfo() {
                         <UserOutlined/>
                       </div>
                       <span className="text">
-                        Name: {wines[0]?.supplierName}
+                        Name: {offer[0]?.supplierName}
                       </span>
                     </Row>
                     <Divider />
@@ -84,7 +97,7 @@ export default function OfferInfo() {
                         <MailOutlined/>
                       </div>
                       <span className="text">
-                        Email: {wines[0]?.supplierEmail}
+                        Email: {offer[0]?.supplierEmail}
                       </span>
                     </Row>
                     <Divider />
@@ -93,7 +106,7 @@ export default function OfferInfo() {
                         <MessageOutlined/>
                       </div>
                       <span className="text"> Original offer text: </span>
-                      <span className="text" style={{ margin: "10px 0px 0px 50px" }}> {wines[0]?.originalOfferText} </span>
+                      <span className="text" style={{ margin: "10px 0px 0px 50px" }}> {offer[0]?.originalOfferText} </span>
                     </Row>
                     <Divider />
                     <Row>
@@ -101,7 +114,7 @@ export default function OfferInfo() {
                         <FieldTimeOutlined/>
                       </div>
                       <span className="text">
-                        Created at: {wines[0]?.createdAt}
+                        Created at: {offer[0]?.createdAt}
                       </span>
                     </Row>
                   </Col>
@@ -117,7 +130,7 @@ export default function OfferInfo() {
                         <EyeOutlined/>
                       </div>
                       <span className="text">
-                        Name: {wines[0]?.wineName}
+                        Name: {offer[0]?.wineName}
                       </span>
                     </Row>
                     <Divider />
@@ -126,7 +139,7 @@ export default function OfferInfo() {
                         <UserOutlined/>
                       </div>
                       <div className="text">
-                        Producer: {wines[0]?.producer}
+                        Producer: {offer[0]?.producer}
                       </div>
                     </Row>
                     <Divider />
@@ -134,7 +147,7 @@ export default function OfferInfo() {
                       <div className="icon">
                         <GlobalOutlined/>
                       </div>
-                      <span className="text">Region: {wines[0]?.region}</span>
+                      <span className="text">Region: {offer[0]?.region}</span>
                     </Row>
                     <Divider />
                     <Row>
@@ -142,7 +155,7 @@ export default function OfferInfo() {
                         <EnvironmentOutlined/>
                       </div>
                       <span className="text">
-                        Sub Region: {wines[0]?.subRegion}
+                        Sub Region: {offer[0]?.subRegion}
                       </span>
                     </Row>
                     <Divider />
@@ -150,14 +163,14 @@ export default function OfferInfo() {
                       <div className="icon">
                         <HourglassOutlined/>
                       </div>
-                      <span className="text">Year: {wines[0]?.year}</span>
+                      <span className="text">Year: {offer[0]?.year}</span>
                     </Row>
                     <Divider />
                     <Row>
                       <div className="icon">
                         <ExperimentOutlined/>
                       </div>
-                      <span className="text">Colour: {wines[0]?.colour}</span>
+                      <span className="text">Colour: {offer[0]?.colour}</span>
                     </Row>
                     <Divider />
                     <Row>
@@ -165,7 +178,7 @@ export default function OfferInfo() {
                         <FieldNumberOutlined/>
                       </div>
                       <span className="text">
-                        LWIN: {wines[0]?.linkedWineLwin}
+                        LWIN: {offer[0]?.linkedWineLwin}
                       </span>
                     </Row>
                   </Col>
@@ -181,8 +194,8 @@ export default function OfferInfo() {
                         <GiftOutlined/>
                       </div>
                       <span className="text">
-                        Package Features: {wines[0]?.isOWC} {wines[0]?.isOC}{" "}
-                        {wines[0]?.isIB}
+                        Package Features: {offer[0]?.isOWC} {offer[0]?.isOC}{" "}
+                        {offer[0]?.isIB}
                       </span>
                     </Row>
                     <Divider />
@@ -191,7 +204,7 @@ export default function OfferInfo() {
                         <GoldOutlined/>
                       </div>
                       <span className="text">
-                        Bottles per case: {wines[0]?.bottlesPerCase}
+                        Bottles per case: {offer[0]?.bottlesPerCase}
                       </span>
                     </Row>
                     <Divider />
@@ -200,7 +213,7 @@ export default function OfferInfo() {
                         <ExperimentOutlined/>
                       </div>
                       <span className="text">
-                        Bottle size: {wines[0]?.bottleSize}
+                        Bottle size: {offer[0]?.bottleSize}
                       </span>
                     </Row>
                     <Divider />
@@ -209,12 +222,23 @@ export default function OfferInfo() {
                         <ExperimentOutlined/>
                       </div>
                       <span className="text">
-                        Bottle size (numerical): {wines[0]?.bottleSizeNumerical}
+                        Bottle size (numerical): {offer[0]?.bottleSizeNumerical}
                       </span>
                     </Row>
                   </Col>
                 </Col>
               </Row>
+            </Row>
+            <Row justify="center">
+              <div className="tableBox">
+                {tableLoading? (
+                  <div className="spin">
+                    <Spin size="large" />
+                  </div>
+                ) : (
+                  <RelatedOffersTable id={offer[0].id} LWIN={lwin}/>
+                )}
+              </div>
             </Row>
             <div style={{ height: "60px" }}></div>
           </div>

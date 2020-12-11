@@ -19,12 +19,11 @@
   font-size: 22px;
   display: flex;
   justify-content: center;
-  margin: 0px 0px 0px 15px;
+  margin: 0px 15px 0px 15px;
   font-family: "Quicksand", sans-serif;
 }
 
 .header2Text {
-  font-weight: bold;
   font-size: 28px;
   display: flex;
   justify-content: center;
@@ -42,7 +41,17 @@
 
 .infoBox {
   background-color: #FFFFFF;//#FEEDEC;
-  padding: 0px 20px 50px 20px;
+  padding: 0px 200px 50px 20px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  border-radius: 25px;
+  box-shadow: 3px 3px lightgray;
+}
+
+.tableBox {
+  background-color: #FFFFFF;//#FEEDEC;
+  padding: 20px 20px 50px 20px;
+  width: 95%;
   margin-top: 20px;
   margin-bottom: 30px;
   border-radius: 25px;

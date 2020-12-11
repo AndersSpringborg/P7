@@ -88,6 +88,10 @@ def get_offers_from_timestamp(arg):
 def get_offer_by_id(arg):
     return wine_db.get_offer_by_id(arg)
 
+@ app.route('/GetOffersByLWIN/', methods=['GET'])
+def get_offers_by_LWIN():
+    return wine_db.get_offers_by_LWIN(request.args.get('id'), request.args.get('lwin'))
+
 @ app.route('/GetTransactions', methods=['GET'])
 def get_all_transactions():
     return wine_db.get_all_transactions()
