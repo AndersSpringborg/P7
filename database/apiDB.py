@@ -5,6 +5,7 @@ from flask_cors import CORS
 import pandas as pd
 import io
 import json
+import datetime
 
 app = flask.Flask(__name__)
 CORS(app)
@@ -38,7 +39,7 @@ def global_prices_post():
 
     for data_entry in prices_data:
         global_price = db.Global_Price(
-            data_entry['WineLWIN'], data_entry['WinePrice1'], data_entry['WineYear'])
+            data_entry['WineLWIN'], data_entry['ScrapedPrice'], datetime.datetime.now())
         prices.append(global_price)
 
     wine_db.add_global_prices(prices)

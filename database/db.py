@@ -2,6 +2,7 @@ import sqlite3
 import pandas as pd
 import json
 import flask
+import numpy as np
 
 
 class System_Object:
@@ -374,7 +375,7 @@ class wine_db:
                                 offers_FK)
                                 VALUES(?)''', [str(result['id'])])
 
-            cursor.execute('''INSERT OR IGNORE INTO price_difference(
+            cursor.execute('''INSERT INTO price_difference(
                                 offers_FK,
                                 price_difference)
                                 VALUES(?,?)''', (str(result['id']), result['price_diff']))
@@ -391,12 +392,16 @@ class wine_db:
 
         for price in prices:
             print("Inserting global price: " + str(price.lwin))
+
             cursor = self.connection.cursor()
-            cursor.execute('''INSERT OR IGNORE INTO global_price(
+            if not (np.isnan(price.lwin) or price.price is None):
+                cleanedPrice = price.price
+                cleanedPrice = cleanedPrice.replace(',', '')[2:]
+                cursor.execute('''INSERT OR IGNORE INTO global_price(
                                             LWIN_FK,
                                             global_price,
                                             date)
-                                            VALUES(?,?,?)''', (price.lwin, price.price, price.date))
+                                            VALUES(?,?,?)''', (int(price.lwin), int(cleanedPrice), price.date))
 
         self.connection.commit()
         self.connection.close()
@@ -498,7 +503,7 @@ class wine_db:
 
     # Initializer of Offer_class given JSON instance.
     def create_offer_obj(self, offer):
-        return Offer_Class(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
+        return Offer_Class(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], int(offer['linkedWineLwin']), offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
 
     # Initializer of Transaction_Class given JSON instance.
     def create_transaction_obj(self, transaction):
@@ -532,4 +537,5 @@ class wine_db:
         rows = cursor.execute(sql).fetchall()
 
         self.connection.close()
+
         return flask.jsonify([dict(ix) for ix in rows])

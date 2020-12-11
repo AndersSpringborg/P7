@@ -1,4 +1,4 @@
-NameOfWine, WineName,WineLWIN,WineYear,WineYear1,WinePrice,WinePrice1
+ScrapedName, OriginalName,WineLWIN,OriginalYear,ScrapedYear,OriginalPrice,ScrapedPrice
 Chateau De La Maltroye Chassagne Montrachet La Boudriotte Premier Cru - 2017,Boudriotte,1078972.0,2017,2017,100.0,£ 408
 Domaine Blain Gagnard Chassagne Montrachet La Boudriotte Premier Cru - 2017,Boudriotte,1078972.0,2017,2017,100.0,£ 775
 Domaine Bruno Colin La Boudriotte Chassagne-Montrachet Premier Cru - 2017,Boudriotte,1078972.0,2017,2017,100.0,£ 594
