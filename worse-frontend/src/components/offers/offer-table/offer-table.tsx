@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Table, Input, Button, Space, Spin, Dropdown, Menu, Row } from "antd";
+import { Table, Input, Button, Space, Spin } from "antd";
 import Highlighter from "react-highlight-words";
-import { CheckOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-table.scss";
 
 export default function OfferTable() {
-  const [offers, setOffers] = useState<WineOffer[]>([]);
-  const [data, setData] = useState<WineOffer[]>([]);
+  const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [chosenDropdownItem, setChosenDropdownItem] = useState<number>(3);
   const [searchState, setSearchState] = useState<{
     searchText: any;
     searchedColumn: any;
@@ -19,31 +17,15 @@ export default function OfferTable() {
   const [searchInput, setSearchInput] = useState<any>(null);
 
   // Endpoint for retrieval of the wine offers from after a given timestamp
-  const getOffersURL = "http://localhost:49500/recommendation";
+  const getOffersURL = "http://localhost:5000/GetAllOffers";
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if(chosenDropdownItem === 0) {
-      setData(offers.filter(x => x.svm_key != null));
-    } else if (chosenDropdownItem === 1) {
-      setData(offers.filter(x => x.nb_key != null));
-    } else if (chosenDropdownItem === 2) {
-      setData(offers.filter(x => x.logit_key != null));
-    } else {
-      setData(offers);
-    }
-  }, [chosenDropdownItem, offers]);
-
   const fetchData = async () => {
     setLoading(true);
-    const response = await axios.get(getOffersURL, {
-      headers: {
-        'X-Token': 23984728947
-      }
-    });
+    const response = await axios.get(getOffersURL);
 
     setOffers(response.data);
     setLoading(false);
@@ -139,24 +121,6 @@ export default function OfferTable() {
     setSearchState({ searchText: "", searchedColumn: "" });
   };
 
-  const DropdownItems = (
-    <Menu>
-      <Menu.Item key="0" onClick={e => setChosenDropdownItem(0)}>
-        Support Vector Machine {chosenDropdownItem === 0? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-      <Menu.Item key="1" onClick={e => setChosenDropdownItem(1)}>
-        Naive Bayes {chosenDropdownItem === 1? <CheckOutlined /> : <div/>}
-      </Menu.Item >
-      <Menu.Item key="2" onClick={e => setChosenDropdownItem(2)}>
-        Logistic Regression {chosenDropdownItem === 2? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="3" onClick={e => setChosenDropdownItem(3)}>
-        Show all offers {chosenDropdownItem === 3? <CheckOutlined /> : <div/>}
-      </Menu.Item>
-    </Menu>
-  );
-
   // Defines the columns for the offer table
   const offerTableColumns = [
     {
@@ -214,14 +178,6 @@ export default function OfferTable() {
         className="site-layout-background"
         style={{ padding: 24, minHeight: 360 }}
       >
-        <Row justify={"end"}>
-          <Dropdown overlay={DropdownItems} trigger={['click']} >
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              Choose recommendation algorithm <DownOutlined />
-            </a>
-          </Dropdown>
-        </Row>
-        <div style={{ height: "30px" }}></div>
         {loading ? (
           <div className="spin">
             <Spin size="large" />
@@ -229,7 +185,7 @@ export default function OfferTable() {
         ) : (
           <Table
             columns={offerTableColumns}
-            dataSource={data}
+            dataSource={offers}
             onRow={(record, rowIndex) => {
               return {
                 onClick: (event) => {

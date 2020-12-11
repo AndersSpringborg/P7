@@ -7,12 +7,12 @@ import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-info.scss";
 
-export default function WineInfo() {
+export default function OfferTable() {
   const [wines, setWines] = useState<WineOffer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { id }: any = useParams();
-  const apiURL = `http://localhost:49500/wine/${id || ""}`;
+  const apiURL = `http://localhost:5000/GetOfferById/${id || ""}`;
   useEffect(() => {
     fetchData();
   }, []);
@@ -44,53 +44,25 @@ export default function WineInfo() {
             {wines[0]?.wineName} {wines[0]?.year}{" "}
           </div>
           <div
-            //sstyle={{ padding: 24, minHeight: 360 }}
+            className="site-layout-background"
+            style={{ padding: 24, minHeight: 360 }}
           >
+            <Row justify="center">
+              <Col style={{ width: "100vh" }}>
+                <Row>
+                  <span className="text">
+                    Price: {wines[0]?.price} {wines[0]?.currency}
+                  </span>
+                </Row>
+                <Divider />
+                <Row>
+                  <span className="text">Quantity: {wines[0]?.quantity}</span>
+                </Row>
+              </Col>
+            </Row>
+            <div style={{ height: "60px" }}></div>
             <Row style={{ justifyContent: "center" }}>
-              <Row justify="center" className="infoBox">
-                <Col style={{ width: "40vh" }}>
-                  <h1 className="header2Text">Offer & Supplier</h1>
-                  <Col>
-                    <Row>
-                      <span className="text">
-                        Price: {wines[0]?.price} {wines[0]?.currency}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Quantity: {wines[0]?.quantity}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Name: {wines[0]?.supplierName}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Email: {wines[0]?.supplierEmail}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Original offer text: {wines[0]?.originalOfferText}
-                      </span>
-                    </Row>
-                    <Divider />
-                    <Row>
-                      <span className="text">
-                        Created at: {wines[0]?.createdAt}
-                      </span>
-                    </Row>
-                  </Col>
-                </Col>
-              </Row>
-              <div style={{ width: "110px" }}/>
-              <Row justify="center" className="infoBox">
+              <Row justify="center">
                 <Col style={{ width: "40vh" }}>
                   <h1 className="header2Text">Wine</h1>
                   <Col>
@@ -133,7 +105,7 @@ export default function WineInfo() {
                 </Col>
               </Row>
               <div style={{ width: "110px" }}></div>
-              <Row justify="center" className="infoBox">
+              <Row justify="center">
                 <Col style={{ width: "40vh" }}>
                   <h1 className="header2Text">Packaging</h1>
                   <Col>
@@ -159,6 +131,37 @@ export default function WineInfo() {
                     <Row>
                       <span className="text">
                         Bottle size (numerical): {wines[0]?.bottleSizeNumerical}
+                      </span>
+                    </Row>
+                  </Col>
+                </Col>
+              </Row>
+              <div style={{ width: "110px" }}></div>
+              <Row justify="center">
+                <Col style={{ width: "40vh" }}>
+                  <h1 className="header2Text">Supplier & Offer</h1>
+                  <Col>
+                    <Row>
+                      <span className="text">
+                        Name: {wines[0]?.supplierName}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Email: {wines[0]?.supplierEmail}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Original offer text: {wines[0]?.originalOfferText}
+                      </span>
+                    </Row>
+                    <Divider />
+                    <Row>
+                      <span className="text">
+                        Created at: {wines[0]?.createdAt}
                       </span>
                     </Row>
                   </Col>
