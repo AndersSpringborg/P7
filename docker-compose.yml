@@ -7,15 +7,27 @@ services:
         build: ./API/
         ports:
         - 49500:49500
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
 
     database:
         image: python:3.9.0-slim-buster
         build: ./database/
         ports:
         - 49502:49500
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
 
     recommender:
         image: python:3.9.0-slim-buster
         build: ./recommender/
         ports:
         - 49501:49500
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
