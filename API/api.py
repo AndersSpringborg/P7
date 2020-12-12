@@ -35,7 +35,7 @@ def main_page():
             GET: /recommendation_get/ -> Gets recommended wine deals.'''
 
 # Handles GET request from UI for database content.
-@app.route('/recommendation', methods = ['GET'])
+@app.route('/recommendation', methods=['GET'])
 def db_get():
     global mtx
 
@@ -47,7 +47,7 @@ def db_get():
             pass
 
     response = requests.get(DB_DOMAIN + '/GetRecommendation')
-    
+
     if (int(response.status_code) >= 400):
         mtx = False
         make_response('Database component error', response.status_code)
@@ -68,7 +68,7 @@ def db_get_transactions():
             pass
 
     response = requests.get(DB_DOMAIN + '/GetTransactions')
-    
+
     if (int(response.status_code) >= 400):
         mtx = False
         make_response('Database component error', response.status_code)
@@ -77,7 +77,7 @@ def db_get_transactions():
     return response.content
 
 # Gets single wine by given wine ID.
-@app.route('/wine/<arg>', methods = ['GET'])
+@app.route('/wine/<arg>', methods=['GET'])
 def get_wine(arg):
     global mtx
     
@@ -95,7 +95,7 @@ def get_wine(arg):
     return response.content
 
 # Gets single transaction by given ID.
-@app.route('/transaction/<arg>', methods = ['GET'])
+@app.route('/transaction/<arg>', methods=['GET'])
 def get_transaction(arg):
     global mtx
     
@@ -114,7 +114,7 @@ def get_transaction(arg):
 
 # Handles POST request from 3rd party to add global wine prices.
 # Appends new global wine prices to db.
-@app.route('/global_prices', methods = ['POST'])
+@app.route('/global_prices', methods=['POST'])
 def global_prices_post():
     global mtx
 
@@ -125,7 +125,8 @@ def global_prices_post():
         while compare_swap(False, True):
             pass
 
-    response = requests.post(DB_DOMAIN + '/AddGlobalPrices', json = request.get_json())
+    response = requests.post(
+        DB_DOMAIN + '/AddGlobalPrices', data=request.data)
 
     if (int(response.status_code) >= 400):
         mtx = False
@@ -136,7 +137,9 @@ def global_prices_post():
 
 # Handles POST request from 3rd party to add transaction data.
 # Appends new transaction data to transactions relation in db.
-@app.route('/data/transactions', methods = ['POST'])
+
+
+@app.route('/data/transactions', methods=['POST'])
 def transactions_post():
     global mtx
 
@@ -147,7 +150,7 @@ def transactions_post():
         while compare_swap(False, True):
             pass
 
-    response = requests.post(DB_DOMAIN + '/AddTransactions', data = request.data)
+    response = requests.post(DB_DOMAIN + '/AddTransactions', data=request.data)
 
     if (int(response.status_code) >= 400):
         mtx = False
@@ -158,7 +161,7 @@ def transactions_post():
 
 # Handles POST request from 3rd party to add wine deals data.
 # Retrieves copy of wine deals relation and sends it to recommender API.
-@app.route('/data/wine_deals', methods = ['POST'])
+@app.route('/data/wine_deals', methods=['POST'])
 def wine_deals_post():
     global mtx
 
@@ -170,23 +173,27 @@ def wine_deals_post():
             pass
 
     json_in = request.get_json()
-    db_response = requests.post(DB_DOMAIN + '/AddOffers', json = json_in['WineDeals'])
+    db_response = requests.post(
+        DB_DOMAIN + '/AddOffers', json=json_in['WineDeals'])
 
     if (int(db_response.status_code) >= 400):
         mtx = False
         make_response('Database component error', db_response.status_code)
 
     merged = {
-        "WineDeals": json.loads(db_response.text),
+        "WineDeals": db_response.json(),
         "model_type": json_in['model_type']
     }
-    rec_result = requests.post(RECOMMENDER_DOMAIN + '/update-recommendation', json = merged)
+
+    rec_result = requests.post(
+        RECOMMENDER_DOMAIN + '/update-recommendation/', json=merged)
 
     if (int(rec_result.status_code) >= 400):
         mtx = False
         make_response('Recommender component error', rec_result.status_code)
 
-    db_result_post = requests.post(DB_DOMAIN + '/NewRecommendation', json = json.loads(rec_result.text))
+    db_result_post = requests.post(
+        DB_DOMAIN + '/NewRecommendation', json=json.loads(rec_result.text))
 
     if (int(db_result_post.status_code) >= 400):
         mtx = False
@@ -197,7 +204,7 @@ def wine_deals_post():
 
 # Handles POST request from 3rd party to set data interval.
 # Retrieves copy of transactions relation and wine deals relation within specified time interval and sends it to recommender API.
-@app.route('/data/time', methods = ['POST'])
+@app.route('/data/time', methods=['POST'])
 def interval_post():
     global mtx
     json_data = request.get_json()
@@ -212,8 +219,9 @@ def interval_post():
         while compare_swap(False, True):
             pass
 
-    get_response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(json_data['TimeInterval']['Time']), headers = {'model-type': json_data['TimeInterval']['model_type']})
-    
+    get_response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(
+        json_data['TimeInterval']['Time']), headers={'model-type': json_data['TimeInterval']['model_type']})
+
     if (int(get_response.status_code) >= 400):
         mtx = False
         return make_response('Database component error', get_response.status_code)
@@ -222,8 +230,10 @@ def interval_post():
         "WineDeals": json.loads(get_response.text),
         "model_type": json_data['TimeInterval']['model_type']
     }
-    post_response = requests.post(RECOMMENDER_DOMAIN + '/update-model', json = merged)
-    
+
+    post_response = requests.post(
+        RECOMMENDER_DOMAIN + '/update-model/', json=merged)
+
     if (int(post_response.status_code) >= 400):
         mtx = False
         make_response('Recommender component error', post_response.status_code)
@@ -248,6 +258,7 @@ def compare_swap(expected, new):
 
     return actual
 
+
 if __name__ == "__main__":
     if (len(sys.argv) >= 2):
         if (sys.argv[1] == 'local' or (len(sys.argv) >= 3 and sys.argv[2] == 'local')):
@@ -257,4 +268,4 @@ if __name__ == "__main__":
         if (sys.argv[1] == 'nolock' or (len(sys.argv) >= 3 and sys.argv[2] == 'nolock')):
             lock = False
 
-    app.run(host = '0.0.0.0', port = 49500)
+    app.run(host='0.0.0.0', port=49500)
