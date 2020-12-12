@@ -206,7 +206,6 @@ export default function OfferTable() {
       key: "price",
       width: "10%",
       sorter: (a: any, b: any) => a.price - b.price,
-      ...getColumnSearchProps("price"),
     },
     {
       title: "Currency",

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
-import { Row, Col, Divider, Spin, Table, Input, Space } from "antd";
-import { EnvironmentOutlined, EuroOutlined, ExperimentOutlined, EyeOutlined, FieldNumberOutlined, FieldTimeOutlined, GiftOutlined, GlobalOutlined, GoldOutlined, HourglassOutlined, LeftCircleOutlined, MailOutlined, MessageOutlined, PropertySafetyFilled, UserOutlined } from "@ant-design/icons";
+import { Row, Col, Divider, Spin } from "antd";
+import { EnvironmentOutlined, EuroOutlined, ExperimentOutlined, EyeOutlined, FieldNumberOutlined, FieldTimeOutlined, GiftOutlined, GlobalOutlined, GoldOutlined, HourglassOutlined, LeftCircleOutlined, MailOutlined, MessageOutlined, UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-info.scss";

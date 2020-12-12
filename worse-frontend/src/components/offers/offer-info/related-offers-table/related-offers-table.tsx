@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Table, Input, Button, Space, Spin, Dropdown, Menu, Row } from "antd";
+import { Table, Input, Button, Space, Spin } from "antd";
 import Highlighter from "react-highlight-words";
-import { CheckOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./related-offers-table.scss";
@@ -163,7 +163,6 @@ export default function RelatedOffersTable(props: {id: any, LWIN? : any}) {
       key: "price",
       width: "10%",
       sorter: (a: WineOffer, b: WineOffer) => a.price - b.price,
-      ...getColumnSearchProps("price"),
     },
     {
       title: "Currency",
