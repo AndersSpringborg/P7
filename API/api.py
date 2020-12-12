@@ -11,8 +11,8 @@ mtx = False
 
 DB_PORT = 49502
 RECOMMENDER_PORT = 49501
-DB_DOMAIN = 'http://localhost:' + str(DB_PORT)
-RECOMMENDER_DOMAIN = 'http://localhost:' + str(RECOMMENDER_PORT)
+DB_DOMAIN = 'http://worse-db:' + str(DB_PORT)
+RECOMMENDER_DOMAIN = 'http://worse-recommender:' + str(RECOMMENDER_PORT)
 
 # Dictionary of tokens for each component.
 tokens = {
@@ -41,7 +41,6 @@ def db_get():
     while compare_swap(False, True):
         pass
 
-    print(DB_DOMAIN)
     response = requests.get(DB_DOMAIN + '/GetRecommendation')
     
     if (int(response.status_code) >= 400):
@@ -182,7 +181,6 @@ def wine_deals_post():
         mtx = False
         make_response('Database component error', db_response.status_code)
     
-    print(db_response.json())
     merged = {
         "WineDeals": json.loads(db_response.text),
         "model_type": json_in['model_type']
@@ -208,7 +206,6 @@ def wine_deals_post():
 def interval_post():
     global mtx
     json_data = request.get_json()
-    print(json_data)
 
     if (not 'X-token' in request.headers) or int(request.headers['X-Token']) != tokens['third']:
         return make_response('Request not from developer component', 401)
@@ -219,7 +216,6 @@ def interval_post():
     while compare_swap(False, True):
         pass
 
-    print("before get_response")
     get_response = requests.get(DB_DOMAIN + '/GetFromTimestamp/' + str(json_data['TimeInterval']['Time']), headers = {'model-type': json_data['TimeInterval']['model_type']})
     
     if (int(get_response.status_code) >= 400):
@@ -230,8 +226,6 @@ def interval_post():
         "WineDeals": json.loads(get_response.text),
         "model_type": json_data['TimeInterval']['model_type']
     }
-    print("before post updatemodel")
-    print(RECOMMENDER_DOMAIN)
 
     post_response = requests.post(RECOMMENDER_DOMAIN + '/update-model/', json = merged)
     
