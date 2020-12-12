@@ -1,6 +1,7 @@
 import pandas as pd
 import random as rand
 import pickle
+import numpy as np
 from os import path
 
 import exceptions
@@ -102,7 +103,8 @@ class DefaultRecommender():
             self.train_input = (x, y)
             return (x, y)
         else:
-            raise exceptions.IncompatibleData("'transactions_id' attribute missing")
+            raise exceptions.IncompatibleData(
+                "'transactions_id' attribute missing")
 
     # converts input attributes to feature matrices
     def feature_to_array(self):
@@ -135,11 +137,13 @@ class DefaultRecommender():
         test_y = y[split_size:]
         return train_x, train_y, test_x, test_y
 
-    
-
     # calculates the possible profit for a wine offer in the dataframe
+
     def get_profit(self, row):
-        return row['global_price'] - row['price']
+        if(np.isnan(row['global_price'])):
+            return np.nan
+
+        return int(row['global_price']) - int(row['price'])
 
     # checks whether model serialisation in model_path exists
     def check_for_model(self, model_path):
@@ -150,13 +154,14 @@ class DefaultRecommender():
             raise exceptions.NoModelException()
         else:
             return
-    
+
     # calculates the price difference and content-based filtering.
     def recommend(self):
         if not 'global_price' in self.offer_df:
             raise exceptions.GlobalWinePriceException(
                 "Global Wine Price Column not defined")
-        self.offer_df['price_diff'] = self.offer_df.apply(lambda row: self.get_profit(row), axis=1)
+        self.offer_df['price_diff'] = self.offer_df.apply(
+            lambda row: self.get_profit(row), axis=1)
         self.content_based_recommend()
 
     # organises the recommendation on proper format and saves it into recommendation field.
@@ -167,4 +172,3 @@ class DefaultRecommender():
             if not column in columns_left:
                 droplist_columns.append(column)
         self.recommendation = self.offer_df.drop(droplist_columns, axis=1)
-

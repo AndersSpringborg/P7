@@ -2,10 +2,13 @@ import sqlite3
 import pandas as pd
 import json
 import flask
+import numpy as np
+
 
 class System_Object:
     def tostring():
         return None
+
 
 class Global_Price(System_Object):
     def __init__(self, lwin_fk, price, date):
@@ -19,6 +22,7 @@ class Global_Price(System_Object):
 
     def tostring(self):
         return '[' + str(self.lwin) + ', ' + str(self.price) + ', ' + str(self.date) + ']'
+
 
 class Offer_Class(System_Object):
     def __init__(self, offerId, supplierName, supplierEmail, linkedWineLwin, originalOfferText, producer, wineName, quantity, year, price, currency, isOWC, isOC, isIB, bottlesPerCase, bottleSize, bottleSizeNumerical, region, subRegion, colour, createdAt, wine_id):
@@ -48,11 +52,13 @@ class Offer_Class(System_Object):
     def tostring():
         return "Not implemented"
 
+
 def offer_class_to_dict(offers):
     offer_arr = []
     for offer in offers:
         offer_arr.extend(offer.__dict__)
     return offer_arr
+
 
 class Transaction_Class(System_Object):
     def __init__(self, vendorId, postingGroup, number, lwinnumber, description, measurementunit, quantity, directunitcost, amount, variantcode, postingdate, purchaseinitials, offers_FK):
@@ -72,6 +78,7 @@ class Transaction_Class(System_Object):
 
     def tostring():
         return "Not implemented"
+
 
 class wine_db:
     def __init__(self, filename="wine.db"):
@@ -349,7 +356,7 @@ class wine_db:
         self.connection.close()
         return [dict(ix) for ix in rows]
 
-    ## Returns globsal price difference of wine.
+    # Returns globsal price difference of wine.
     def global_price_difference(self, id):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
@@ -385,7 +392,7 @@ class wine_db:
                                 offers_FK)
                                 VALUES(?)''', [str(result['id'])])
 
-            cursor.execute('''INSERT OR IGNORE INTO price_difference(
+            cursor.execute('''INSERT INTO price_difference(
                                 offers_FK,
                                 price_difference)
                                 VALUES(?,?)''', (str(result['id']), result['price_diff']))
@@ -401,13 +408,17 @@ class wine_db:
         self.open_connection()
 
         for price in prices:
-            print("Inserting global price: " + price.tostring())
+            print("Inserting global price: " + str(price.lwin))
+
             cursor = self.connection.cursor()
-            cursor.execute('''INSERT OR IGNORE INTO global_price(
+            if not (np.isnan(price.lwin) or price.price is None):
+                cleanedPrice = price.price
+                cleanedPrice = cleanedPrice.replace(',', '')[2:]
+                cursor.execute('''INSERT OR IGNORE INTO global_price(
                                             LWIN_FK,
                                             global_price,
                                             date)
-                                            VALUES(?,?,?)''', (price.lwin, price.price, price.date))
+                                            VALUES(?,?,?)''', (int(price.lwin), int(cleanedPrice), price.date))
 
         self.connection.commit()
         self.connection.close()
@@ -447,7 +458,7 @@ class wine_db:
                                               createdAt,
                                               id)
                                               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (wine.offerId, wine.supplierName, wine.supplierEmail, wine.linkedWineLwin, wine.originalOfferText, wine.producer, wine.wineName, wine.quantity, wine.year, wine.price, wine.currency, wine.isOWC, wine.isOC, wine.isIB, wine.bottlesPerCase, wine.bottleSize, wine.bottleSizeNumerical, wine.region, wine.subRegion, wine.colour, wine.createdAt, wine.id))
-            
+
         self.connection.commit()
         self.connection.close()
 
@@ -479,7 +490,7 @@ class wine_db:
                                               offers_FK
                                               )
                                               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''', (transaction.vendorId, transaction.postingGroup, transaction.number, transaction.lwinnumber, transaction.description, transaction.measurementunit, transaction.quantity, transaction.directunitcost, transaction.amount, transaction.variantcode, transaction.postingdate, transaction.purchaseinitials, transaction.offers_FK))
-        
+
         self.connection.commit()
         self.connection.close()
 
@@ -509,33 +520,39 @@ class wine_db:
 
     # Initializer of Offer_class given JSON instance.
     def create_offer_obj(self, offer):
-        return Offer_Class(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], offer['linkedWineLwin'], offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
+        return Offer_Class(offer['offer']['id'], offer['offer']['supplierName'], offer['offer']['supplierEmail'], int(offer['linkedWineLwin']), offer['originalOfferText'], offer['producer'], offer['wineName'], offer['quantity'], offer['year'], offer['price'], offer['currency'], offer['isOWC'], offer['isOC'], offer['isIB'], offer['bottlesPerCase'], offer['bottleSize'], offer['bottleSizeNumerical'], offer['region'], offer['subRegion'], offer['colour'], offer['createdAt'], offer['id'])
 
     # Initializer of Transaction_Class given JSON instance.
     def create_transaction_obj(self, transaction):
         return Transaction_Class(transaction['Vendor Id'], transaction['Posting Group'], transaction['No_'], transaction['LWIN No_'], transaction['Description'], transaction['Unit of Measure'],
                                  transaction['Quantity'], transaction['Direct Unit Cost'], transaction['Amount'], transaction['Variant Code'], transaction['Posting Date'], transaction['Purchase Initials'], str(transaction['id']))
-    
+
     def create_artificial_offer_obj(self, offer_df_row):
         return Offer_Class(str(offer_df_row['offer']['id']), 'supplierNameArtificial', 'supplier@articial.com', offer_df_row['LWIN No_'], offer_df_row['originalOfferText'], offer_df_row['producer'], offer_df_row['wineName'], offer_df_row['quantity'], offer_df_row['year'], offer_df_row['price'], offer_df_row['currency'], offer_df_row['isOWC'], offer_df_row['isOC'], offer_df_row['isIB'], offer_df_row['bottlesPerCase'], offer_df_row['bottleSize'], offer_df_row['bottleSizeNumerical'], offer_df_row['region'], offer_df_row['subRegion'], offer_df_row['colour'], offer_df_row['createdAt'], str(offer_df_row['id']))
-    
+
+    # Rename get_offers_with_global_prices
     def get_global_price_for_offers(self, offers):
         if (self.connection == None):
             raise Exception("Wine database is closed.")
 
         self.open_connection()
+        self.connection.row_factory = sqlite3.Row
+        cursor = self.connection.cursor()
+
+        lwinnumbers = []
+        offer_ids = []
         for offer in offers:
-            offer_ids.append(str(offer.id))
-            lwinnumbers.append(str(offer.linkedWineLwin))
+            offer_ids.append(repr(offer.id))
+            lwinnumbers.append(repr(offer.linkedWineLwin))
+
         sql_condition_lwin = "(" + ', '.join(lwinnumbers) + ")"
         sql_condition_ids = "(" + ', '.join(offer_ids) + ")"
 
-        sql = "SELECT * FROM (SELECT * FROM offers WHERE id IN " + sql_condition_ids + ") LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
-            sql_condition_lwin + ") global_price" + " ON offers.linkedWineLwin=global_price.LWIN_FK"
+        sql = "SELECT * FROM (SELECT * FROM offers WHERE id IN " + sql_condition_ids + ") offers LEFT OUTER JOIN (SELECT * FROM global_price WHERE LWIN_FK IN " + \
+            sql_condition_lwin + ") global_price ON offers.linkedWineLwin=global_price.LWIN_FK"
 
         rows = cursor.execute(sql).fetchall()
 
         self.connection.close()
-        print(offer_class_to_dict(offers))
-        return offer_class_to_dict( offers)
 
+        return flask.jsonify([dict(ix) for ix in rows])

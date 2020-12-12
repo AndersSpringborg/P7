@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Table, Input, Button, Space, Spin, Dropdown, Menu, Row } from "antd";
+import { Table, Input, Button, Space, Spin } from "antd";
 import Highlighter from "react-highlight-words";
-import { CheckOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
 import "./offer-table.scss";
 
 export default function OfferTable() {
-  const [offers, setOffers] = useState<WineOffer[]>([]);
-  const [data, setData] = useState<WineOffer[]>([]);
+  const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [chosenDropdownItem, setChosenDropdownItem] = useState<number>(3);
   const [searchState, setSearchState] = useState<{
     searchText: any;
     searchedColumn: any;
@@ -39,7 +37,6 @@ export default function OfferTable() {
   useEffect(() => {
     fetchData();
   }, []);
-
 
   // Defines the dropdown elements for the, which recommender algorithm to filter on.
   const DropdownItems = (
@@ -249,7 +246,7 @@ export default function OfferTable() {
         ) : (
           <Table
             columns={offerTableColumns}
-            dataSource={data}
+            dataSource={offers}
             onRow={(record, rowIndex) => {
               return {
                 onClick: (event) => {
