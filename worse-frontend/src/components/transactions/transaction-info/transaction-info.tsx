@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
-import { Row, Col, Divider, Spin } from "antd";
+import { Row, Col, Divider, Spin, Button } from "antd";
 import { LeftCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { Content } from "antd/lib/layout/layout";
@@ -27,6 +27,9 @@ export default function TransactionInfo() {
   };
 
   let history = useHistory();
+  function handleOfferClick(id: string) {
+    history.push(`/offers/${id}`);
+  }
 
   return (
     <Content style={{ margin: "0 16px" }}>
@@ -43,6 +46,9 @@ export default function TransactionInfo() {
             {" "}
             {transaction[0]?.description}{" "}
           </div>
+          <Row justify={"center"}>
+            <Button onClick={e => handleOfferClick(transaction[0]?.offers_FK)} danger>See wine offer</Button>
+          </Row>
           <div
             //sstyle={{ padding: 24, minHeight: 360 }}
           >

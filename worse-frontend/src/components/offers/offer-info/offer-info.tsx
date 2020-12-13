@@ -58,7 +58,7 @@ export default function OfferInfo() {
             {offer[0]?.wineName} {offer[0]?.year}{" "}
           </div>
           <div className="text" style={{padding: "0px 0px 30px 0px"}}>
-            Wine Offer Id: {offer[0].id}
+            Wine Offer Id: {offer[0]?.id}
           </div>
           <div>
             <Row style={{ justifyContent: "center" }}>
