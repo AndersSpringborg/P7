@@ -1,0 +1,42 @@
+.goBack {
+  height: 48px;
+  line-height: 58px;
+  font-size: 32px;
+  cursor: pointer;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+.text {
+  font-size: 18px;
+  display: flex;
+  justify-content: center;
+  margin: 0px 0px -15px;
+  font-family: "Quicksand", sans-serif;
+}
+
+.header2Text {
+  font-weight: bold;
+  font-size: 28px;
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+  font-family: "Quicksand", sans-serif;
+}
+
+.spin {
+  text-align: center;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  padding: 30px 50px;
+  margin: 20px 0;
+}
+
+.infoBox {
+  background-color: #FFFFFF;//#FEEDEC;
+  padding: 0px 20px 50px 20px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  border-radius: 25px;
+  box-shadow: 3px 3px lightgray;
+}

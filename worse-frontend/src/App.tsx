@@ -33,6 +33,11 @@ function App() {
             <TransactionTable />
           </WorstLayout>
         </Route>
+        <Route exact path="/transactions/:id">
+          <WorstLayout>
+            <TransactionInfo />
+          </WorstLayout>
+        </Route>
       </Switch>
     </Router>
   );
